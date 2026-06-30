@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  INVESTIGATOR
+  CLIENT
+}
+
+enum CaseStatus {
+  NEW
+  VERIFICATION
+  FIELD
+  REPORTING
+  SUBMITTED
+  CLOSED
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  password      String
+  name          String
+  role          Role           @default(CLIENT)
+  companyName   String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  assignedCases Case[]         @relation("CaseAssignee")
+  clientCases   Case[]         @relation("CaseClient")
+  activityLogs  ActivityLog[]
+  comments      Comment[]
+}
+
+model Case {
+  id            String         @id @default(cuid())
+  policyNumber  String
+  insuredName   String
+  status        CaseStatus     @default(NEW)
+  description   String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  clientId      String
+  client        User           @relation("CaseClient", fields: [clientId], references: [id])
+
+  assigneeId    String?
+  assignee      User?          @relation("CaseAssignee", fields: [assigneeId], references: [id])
+
+  activityLogs  ActivityLog[]
+  comments      Comment[]
+
+  @@index([status])
+  @@index([clientId])
+  @@index([assigneeId])
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  description String
+  timestamp   DateTime @default(now())
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+
+  @@index([caseId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([caseId])
+}

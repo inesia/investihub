@@ -52,6 +52,13 @@ export const mockClients: MockClient[] = [
     phone: "+62 21 8765 4321",
     activeCases: 8,
   },
+  {
+    id: "client-003",
+    name: "PT Prudential Life Assurance",
+    email: "info@prudential.co.id",
+    phone: "+62 21 2995 8888",
+    activeCases: 5,
+  },
 ];
 
 function normalize(value: string): string {

@@ -27,6 +27,8 @@ export async function POST(request: Request) {
     email: user.email,
     role: user.role,
     companyName: user.companyName,
+    clientId: user.clientId,
+    tenantSlug: user.tenantSlug,
   });
 
   const response = NextResponse.json({
@@ -36,6 +38,8 @@ export async function POST(request: Request) {
       email: user.email,
       role: user.role,
       companyName: user.companyName,
+      clientId: user.clientId,
+      tenantSlug: user.tenantSlug,
     },
   });
 

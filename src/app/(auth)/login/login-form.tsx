@@ -4,8 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Shield, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
+import { BrandLogo } from "@/components/brand/brand-logo";
+import { PoweredByOperator } from "@/components/brand/powered-by-operator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,14 +31,20 @@ export default function LoginForm() {
     setIsLoading(false);
   };
 
+  const fillDemo = (demoEmail: string) => {
+    setEmail(demoEmail);
+    setPassword("password123");
+    setError("");
+  };
+
   return (
     <div className="flex min-h-screen">
       <div className="hidden w-1/2 flex-col justify-between bg-black p-12 lg:flex">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <Shield className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-xl font-bold text-white">InvestiHub</span>
+        <div>
+          <BrandLogo tenant="default" inverted textClassName="text-white" />
+          <p className="mt-3 text-sm text-white/55">
+            A product of PT. Global Investigasi
+          </p>
         </div>
         <div>
           <h2 className="text-4xl font-bold leading-tight text-white">
@@ -48,9 +56,12 @@ export default function LoginForm() {
             Streamline your investigation workflow with our comprehensive case management platform.
           </p>
         </div>
-        <p className="text-sm text-white/40">
-          &copy; 2024 InvestiHub. All rights reserved.
-        </p>
+        <div className="space-y-3">
+          <PoweredByOperator inverted />
+          <p className="text-sm text-white/40">
+            &copy; 2026 InvestiHub · PT. Global Investigasi
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-1 items-center justify-center bg-white p-6">
@@ -60,13 +71,9 @@ export default function LoginForm() {
           transition={{ duration: 0.4 }}
           className="w-full max-w-md"
         >
-          <div className="mb-8 lg:hidden">
-            <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-                <Shield className="h-4 w-4 text-white" />
-              </div>
-              <span className="text-lg font-bold">InvestiHub</span>
-            </div>
+          <div className="mb-8 space-y-3 lg:hidden">
+            <BrandLogo tenant="default" />
+            <PoweredByOperator />
           </div>
 
           <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
@@ -75,7 +82,7 @@ export default function LoginForm() {
           </p>
 
           {searchParams.get("callbackUrl") && (
-            <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-xs text-primary">
+            <p className="mt-3 rounded-md bg-accent px-3 py-2 text-xs text-primary">
               Please sign in to continue
             </p>
           )}
@@ -120,7 +127,7 @@ export default function LoginForm() {
             </div>
 
             {error && (
-              <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-primary">
+              <p className="rounded-md bg-accent px-3 py-2 text-sm text-primary">
                 {error}
               </p>
             )}
@@ -134,14 +141,77 @@ export default function LoginForm() {
             </Button>
           </form>
 
-          <div className="mt-6 rounded-lg border border-dashed border-neutral-200 p-4">
-            <p className="mb-2 text-xs font-medium text-muted-foreground">
-              Demo accounts:
+          <div className="mt-6 space-y-3 rounded-lg border border-dashed border-neutral-200 p-4">
+            <p className="text-xs font-medium text-muted-foreground">
+              Demo accounts (password: password123):
             </p>
-            <div className="space-y-1 text-xs text-muted-foreground">
-              <p>Investigator: investigator@investihub.com</p>
-              <p>Client: client@investihub.com</p>
-              <p>Password: password123</p>
+            <div className="grid gap-2">
+              <button
+                type="button"
+                onClick={() => fillDemo("investigator@investihub.com")}
+                className="rounded-md border border-neutral-200 px-3 py-2 text-left text-xs transition-colors hover:bg-neutral-50"
+              >
+                <span className="font-medium text-foreground">Investigator</span>
+                <span className="mt-0.5 block text-muted-foreground">
+                  investigator@investihub.com
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemo("client@investihub.com")}
+                className="rounded-md border border-neutral-200 px-3 py-2 text-left text-xs transition-colors hover:bg-neutral-50"
+              >
+                <span className="font-medium text-foreground">Client — Sejahtera</span>
+                <span className="mt-0.5 block text-muted-foreground">
+                  client@investihub.com
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemo("admin@investihub.com")}
+                className="rounded-md border border-neutral-200 px-3 py-2 text-left text-xs transition-colors hover:bg-neutral-50"
+              >
+                <span className="font-medium text-foreground">Admin</span>
+                <span className="mt-0.5 block text-muted-foreground">
+                  admin@investihub.com
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            <div className="rounded-lg border border-[#003781]/20 bg-[#003781]/5 p-4">
+              <p className="text-xs font-medium text-[#003781]">
+                Allianz Indonesia client?
+              </p>
+              <Link
+                href="/login/allianz"
+                className="mt-2 flex items-center gap-2 text-sm font-semibold text-[#003781] hover:underline"
+              >
+                <BrandLogo
+                  tenant="allianz"
+                  variant="mark"
+                  markClassName="h-5 w-auto max-w-[64px]"
+                />
+                Open Allianz Client Portal →
+              </Link>
+            </div>
+
+            <div className="rounded-lg border border-[#687078]/25 bg-[#687078]/5 p-4">
+              <p className="text-xs font-medium text-[#687078]">
+                Prudential Indonesia client?
+              </p>
+              <Link
+                href="/login/prudential"
+                className="mt-2 flex items-center gap-2 text-sm font-semibold text-[#E81828] hover:underline"
+              >
+                <BrandLogo
+                  tenant="prudential"
+                  variant="mark"
+                  markClassName="h-5 w-auto max-w-[72px]"
+                />
+                Open Prudential Client Portal →
+              </Link>
             </div>
           </div>
 

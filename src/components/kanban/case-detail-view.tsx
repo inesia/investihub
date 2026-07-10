@@ -11,7 +11,7 @@ import {
   User,
 } from "lucide-react";
 import type { CaseWithRelations, CommentWithAuthor } from "@/types";
-import { STATUS_LABELS } from "@/types";
+import { STATUS_LABELS, canPostComments } from "@/types";
 import { StatusBadge } from "@/components/kanban/status-badge";
 import { CommentItem } from "@/components/cases/comment-item";
 import { NoteForm, type NoteFormData } from "@/components/cases/note-form";
@@ -35,7 +35,7 @@ const mockTimeline = [
     title: "Documents Uploaded",
     description: "Client uploaded supporting documents and photos",
     timestamp: new Date("2024-06-02T14:30:00"),
-    author: "Budi Santoso",
+    author: "Rina Kusuma",
   },
   {
     id: "tl-3",
@@ -80,8 +80,8 @@ const initialComments: CommentWithAuthor[] = [
       },
     ],
     createdAt: new Date("2024-06-04T15:30:00"),
-    authorId: "client-001",
-    author: { id: "client-001", name: "Budi Santoso", role: "CLIENT" },
+    authorId: "user-client-001",
+    author: { id: "user-client-001", name: "Rina Kusuma", role: "CLIENT" },
   },
 ];
 
@@ -89,7 +89,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<CommentWithAuthor[]>(initialComments);
 
-  const canComment = user?.role === "CLIENT" || user?.role === "INVESTIGATOR";
+  const canComment = canPostComments(user?.role);
 
   const handleSubmitNote = (data: NoteFormData) => {
     if (!user) return;
@@ -239,7 +239,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
 
         {!canComment && (
           <p className="mt-5 text-center text-sm text-muted-foreground">
-            Sign in to add notes
+            Sign in as a Client or Investigator to add notes
           </p>
         )}
       </section>

@@ -9,6 +9,8 @@ export interface SessionPayload {
   email: string;
   role: Role;
   companyName?: string;
+  clientId?: string;
+  tenantSlug?: string;
 }
 
 export function encodeSession(user: SessionPayload): string {
@@ -34,5 +36,7 @@ export function toAuthUser(session: SessionPayload): AuthUser {
     email: session.email,
     role: session.role,
     companyName: session.companyName,
+    clientId: session.clientId,
+    tenantSlug: session.tenantSlug,
   };
 }

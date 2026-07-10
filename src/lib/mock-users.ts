@@ -1,5 +1,6 @@
 import type { Role } from "@prisma/client";
 import type { SessionPayload } from "@/lib/auth-session";
+import { getBrand, resolveTenantSlug } from "@/lib/branding";
 
 export interface MockUser extends SessionPayload {
   password: string;
@@ -15,11 +16,32 @@ const defaultUsers: MockUser[] = [
   },
   {
     id: "user-client-001",
-    name: "Budi Santoso",
+    name: "Rina Kusuma",
     email: "client@investihub.com",
     password: "password123",
     role: "CLIENT",
     companyName: "PT Asuransi Sejahtera",
+    clientId: "client-001",
+  },
+  {
+    id: "user-client-allianz",
+    name: "Siti Rahayu",
+    email: "client@allianz.co.id",
+    password: "password123",
+    role: "CLIENT",
+    companyName: "PT Allianz Indonesia",
+    clientId: "client-002",
+    tenantSlug: "allianz",
+  },
+  {
+    id: "user-client-prudential",
+    name: "Andi Wijaya",
+    email: "client@prudential.co.id",
+    password: "password123",
+    role: "CLIENT",
+    companyName: "PT Prudential Life Assurance",
+    clientId: "client-003",
+    tenantSlug: "prudential",
   },
   {
     id: "user-admin-001",
@@ -58,6 +80,12 @@ export function registerUser(data: {
     return { error: "Email already registered" };
   }
 
+  const tenantSlug = resolveTenantSlug({ companyName: data.companyName });
+  const clientId =
+    data.role === "CLIENT"
+      ? getBrand(tenantSlug).clientId ?? "client-001"
+      : undefined;
+
   const user: MockUser = {
     id: `user-${Date.now()}`,
     name: data.name,
@@ -65,6 +93,8 @@ export function registerUser(data: {
     password: data.password,
     role: data.role,
     companyName: data.companyName,
+    clientId,
+    tenantSlug: tenantSlug === "default" ? undefined : tenantSlug,
   };
 
   registeredUsers = [...registeredUsers, user];

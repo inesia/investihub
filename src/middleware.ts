@@ -1,16 +1,31 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { AUTH_COOKIE } from "@/lib/auth-session";
+import { AUTH_COOKIE, decodeSession } from "@/lib/auth-session";
 
-const publicPaths = ["/", "/login", "/register"];
-const authPaths = ["/login", "/register"];
+const publicPaths = [
+  "/",
+  "/login",
+  "/login/allianz",
+  "/login/prudential",
+  "/register",
+];
+const authPaths = [
+  "/login",
+  "/login/allianz",
+  "/login/prudential",
+  "/register",
+];
+
+function isAuthPage(pathname: string) {
+  return authPaths.some((p) => pathname === p);
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const session = request.cookies.get(AUTH_COOKIE)?.value;
+  const token = request.cookies.get(AUTH_COOKIE)?.value;
+  const session = token ? decodeSession(token) : null;
   const isAuthenticated = Boolean(session);
   const isProtected = pathname.startsWith("/dashboard");
-  const isAuthPage = authPaths.some((p) => pathname === p);
 
   if (isProtected && !isAuthenticated) {
     const loginUrl = new URL("/login", request.url);
@@ -18,11 +33,19 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAuthPage && isAuthenticated) {
+  if (isAuthPage(pathname) && isAuthenticated) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if (!publicPaths.includes(pathname) && !isProtected && !isAuthPage) {
+  // Clients can view cases & comment only — block create case
+  if (
+    pathname.startsWith("/dashboard/cases/new") &&
+    session?.role === "CLIENT"
+  ) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  if (!publicPaths.includes(pathname) && !isProtected && !isAuthPage(pathname)) {
     return NextResponse.next();
   }
 

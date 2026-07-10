@@ -47,7 +47,7 @@ export function AdvancedSearch({ open, onOpenChange }: AdvancedSearchProps) {
 
   const baseCases =
     user?.role === "CLIENT"
-      ? cases.filter((c) => c.clientId === "client-001")
+      ? cases.filter((c) => c.clientId === (user.clientId ?? "client-001"))
       : cases;
 
   const results = useMemo(

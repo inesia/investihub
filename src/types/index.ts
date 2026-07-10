@@ -8,6 +8,10 @@ export interface AuthUser {
   email: string;
   role: Role;
   companyName?: string;
+  /** Links CLIENT users to mock client company (e.g. client-002 = Allianz, client-003 = Prudential) */
+  clientId?: string;
+  /** Tenant branding slug (e.g. "allianz" | "prudential") */
+  tenantSlug?: string;
 }
 
 export interface CaseWithRelations {
@@ -91,12 +95,13 @@ export const STATUS_LABELS: Record<CaseStatus, string> = {
   CLOSED: "Closed",
 };
 
+/** Theme-aware badges — use primary/accent tokens so Allianz blue theme applies */
 export const STATUS_BADGE_STYLES: Record<CaseStatus, string> = {
-  NEW: "bg-red-50 text-red-700 border-red-200",
-  VERIFICATION: "bg-red-100 text-red-800 border-red-300",
-  FIELD: "bg-red-50 text-red-900 border-red-400",
-  REPORTING: "bg-red-100 text-red-600 border-red-200",
-  SUBMITTED: "bg-red-200 text-red-900 border-red-400",
+  NEW: "bg-accent text-primary border-primary/20",
+  VERIFICATION: "bg-primary/10 text-primary border-primary/30",
+  FIELD: "bg-accent text-foreground border-primary/40",
+  REPORTING: "bg-primary/5 text-primary/80 border-primary/20",
+  SUBMITTED: "bg-primary/15 text-primary border-primary/40",
   CLOSED: "bg-neutral-100 text-neutral-600 border-neutral-300",
 };
 
@@ -105,3 +110,13 @@ export const ROLE_LABELS: Record<Role, string> = {
   INVESTIGATOR: "Investigator",
   CLIENT: "Client",
 };
+
+/** Roles that may post notes & comments on a case */
+export function canPostComments(role?: Role | string | null): boolean {
+  return role === "CLIENT" || role === "INVESTIGATOR" || role === "ADMIN";
+}
+
+/** Roles that may create new cases */
+export function canCreateCases(role?: Role | string | null): boolean {
+  return role === "ADMIN" || role === "INVESTIGATOR";
+}

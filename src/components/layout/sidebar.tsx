@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Users,
-  Shield,
   LogOut,
   X,
   ChevronLeft,
@@ -15,6 +14,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/brand/brand-logo";
+import { PoweredByOperator } from "@/components/brand/powered-by-operator";
+import { useTenantBrand } from "@/components/brand/use-tenant-brand";
+import { isBrandedTenant } from "@/lib/branding";
 import { useAuth } from "@/contexts/auth-context";
 
 interface NavItem {
@@ -26,7 +29,12 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "New Case", href: "/dashboard/cases/new", icon: PlusCircle },
+  {
+    label: "New Case",
+    href: "/dashboard/cases/new",
+    icon: PlusCircle,
+    roles: ["ADMIN", "INVESTIGATOR"],
+  },
   { label: "Clients", href: "/dashboard/clients", icon: Users, roles: ["ADMIN"] },
   { label: "Profile", href: "/dashboard/profile", icon: UserCircle },
 ];
@@ -46,6 +54,7 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const brand = useTenantBrand();
 
   const filteredNav = navItems.filter(
     (item) => !item.roles || item.roles.includes(user?.role ?? "")
@@ -53,20 +62,15 @@ export function Sidebar({
 
   const sidebarContent = (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
+      <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 px-4">
         <Link href="/dashboard" className="flex items-center gap-2" onClick={onClose}>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Shield className="h-4 w-4 text-white" />
-          </div>
-          {!isCollapsed && (
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-lg font-bold text-white"
-            >
-              InvestiHub
-            </motion.span>
-          )}
+          <BrandLogo
+            tenant={brand.slug}
+            variant="sidebar"
+            inverted
+            collapsed={isCollapsed}
+            textClassName="text-white"
+          />
         </Link>
         <Button
           variant="ghost"
@@ -78,7 +82,7 @@ export function Sidebar({
         </Button>
       </div>
 
-      <nav className="flex-1 space-y-1 p-3">
+      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto p-3">
         {filteredNav.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -91,7 +95,7 @@ export function Sidebar({
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-primary text-white"
+                  ? "bg-sidebar-accent text-white"
                   : "text-white/70 hover:bg-white/10 hover:text-white",
                 isCollapsed && "justify-center px-2"
               )}
@@ -103,34 +107,48 @@ export function Sidebar({
         })}
       </nav>
 
-      <div className="border-t border-white/10 p-3">
-        <button
-          type="button"
-          onClick={() => logout()}
-          className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white",
-            isCollapsed && "justify-center px-2"
-          )}
-        >
-          <LogOut className="h-4 w-4 shrink-0" />
-          {!isCollapsed && <span>Sign Out</span>}
-        </button>
-      </div>
+      <div className="shrink-0">
+        {!isCollapsed && isBrandedTenant(brand.slug) && (
+          <div className="px-4 pb-2">
+            <p className="rounded-md bg-white/10 px-3 py-2 text-[11px] leading-snug text-white/70">
+              {brand.tagline}
+            </p>
+          </div>
+        )}
 
-      <div className="hidden border-t border-white/10 p-2 lg:block">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggleCollapse}
-          className="w-full justify-center text-white/70 hover:bg-white/10 hover:text-white"
-        >
-          <ChevronLeft
+        <div className={cn("px-3 pb-2", isCollapsed && "px-2")}>
+          <PoweredByOperator inverted collapsed={isCollapsed} />
+        </div>
+
+        <div className="border-t border-white/10 p-3">
+          <button
+            type="button"
+            onClick={() => logout()}
             className={cn(
-              "h-4 w-4 transition-transform",
-              isCollapsed && "rotate-180"
+              "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white",
+              isCollapsed && "justify-center px-2"
             )}
-          />
-        </Button>
+          >
+            <LogOut className="h-4 w-4 shrink-0" />
+            {!isCollapsed && <span>Sign Out</span>}
+          </button>
+        </div>
+
+        <div className="hidden border-t border-white/10 p-2 lg:block">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleCollapse}
+            className="w-full justify-center text-white/70 hover:bg-white/10 hover:text-white"
+          >
+            <ChevronLeft
+              className={cn(
+                "h-4 w-4 transition-transform",
+                isCollapsed && "rotate-180"
+              )}
+            />
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -165,7 +183,7 @@ export function Sidebar({
 
       <aside
         className={cn(
-          "hidden shrink-0 transition-all duration-300 lg:block",
+          "sticky top-0 hidden h-dvh shrink-0 self-start transition-all duration-300 lg:block",
           isCollapsed ? "w-[68px]" : "w-[260px]"
         )}
       >

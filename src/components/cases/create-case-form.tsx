@@ -23,7 +23,9 @@ export function CreateCaseForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const defaultClientId =
-    user?.role === "CLIENT" ? "client-001" : mockClients[0]?.id ?? "";
+    user?.role === "CLIENT"
+      ? (user.clientId ?? "client-001")
+      : mockClients[0]?.id ?? "";
 
   const [form, setForm] = useState<CreateCaseInput>({
     policyNumber: "",
@@ -52,7 +54,8 @@ export function CreateCaseForm() {
 
     const payload: CreateCaseInput = {
       ...form,
-      clientId: user?.role === "CLIENT" ? "client-001" : form.clientId,
+      clientId:
+        user?.role === "CLIENT" ? (user.clientId ?? "client-001") : form.clientId,
       assigneeId: form.assigneeId || undefined,
       description: form.description || undefined,
     };

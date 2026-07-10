@@ -17,6 +17,7 @@ import {
 } from "@/lib/search";
 import { useAuth } from "@/contexts/auth-context";
 import { useCases } from "@/contexts/cases-context";
+import { canCreateCases } from "@/types";
 
 function DashboardContent() {
   const { user } = useAuth();
@@ -31,10 +32,11 @@ function DashboardContent() {
 
   const baseCases = useMemo(() => {
     if (user?.role === "CLIENT") {
-      return cases.filter((c) => c.clientId === "client-001");
+      const clientId = user.clientId ?? "client-001";
+      return cases.filter((c) => c.clientId === clientId);
     }
     return cases;
-  }, [cases, user?.role]);
+  }, [cases, user?.role, user?.clientId]);
 
   const filteredCases = useMemo(
     () => (hasActiveFilters(filters) ? filterCases(baseCases, filters) : baseCases),
@@ -63,18 +65,25 @@ function DashboardContent() {
     [filters, router]
   );
 
+  const allowCreate = canCreateCases(user?.role);
+
+  const subtitle =
+    user?.role === "CLIENT"
+      ? "Track your claim cases, review timeline progress, and leave comments"
+      : "Track and manage insurance claim cases across all stages";
+
   return (
     <AppShell title="Case Board">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-muted-foreground">
-          Track and manage insurance claim cases across all stages
-        </p>
-        <Button asChild size="sm" className="shrink-0">
-          <Link href="/dashboard/cases/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Case
-          </Link>
-        </Button>
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
+        {allowCreate && (
+          <Button asChild size="sm" className="shrink-0">
+            <Link href="/dashboard/cases/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Case
+            </Link>
+          </Button>
+        )}
       </div>
 
       <ActiveSearchFilters
@@ -95,14 +104,18 @@ function DashboardContent() {
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-neutral-200 py-16 text-center">
           <p className="font-medium">No cases match your search</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Try adjusting filters or create a new case
+            {user?.role === "CLIENT"
+              ? "Try adjusting filters, or check back later for updates"
+              : "Try adjusting filters or create a new case"}
           </p>
-          <Button asChild className="mt-4" size="sm">
-            <Link href="/dashboard/cases/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Create Case
-            </Link>
-          </Button>
+          {allowCreate && (
+            <Button asChild className="mt-4" size="sm">
+              <Link href="/dashboard/cases/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Case
+              </Link>
+            </Button>
+          )}
         </div>
       ) : (
         <KanbanBoard cases={filteredCases} />

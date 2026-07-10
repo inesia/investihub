@@ -12,8 +12,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/auth-context";
+import { useTenantBrand } from "@/components/brand/use-tenant-brand";
 import { ROLE_LABELS } from "@/types";
-import { getInitials } from "@/lib/utils";
+import { getInitials, cn } from "@/lib/utils";
+import { isBrandedTenant } from "@/lib/branding";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -25,11 +27,12 @@ export function AppShell({ children, title = "Dashboard" }: AppShellProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { user } = useAuth();
+  const brand = useTenantBrand();
 
   useSearchShortcut(() => setSearchOpen(true));
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex h-dvh overflow-hidden bg-background">
       <Sidebar
         isOpen={sidebarOpen}
         isCollapsed={sidebarCollapsed}
@@ -39,8 +42,13 @@ export function AppShell({ children, title = "Dashboard" }: AppShellProps) {
 
       <AdvancedSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-neutral-200 bg-white px-4 md:px-6">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <header
+          className={cn(
+            "z-30 flex h-16 shrink-0 items-center gap-3 border-b bg-background px-4 md:px-6",
+            brand.slug !== "default" ? "border-primary/15" : "border-neutral-200"
+          )}
+        >
           <Button
             variant="ghost"
             size="icon"
@@ -51,9 +59,16 @@ export function AppShell({ children, title = "Dashboard" }: AppShellProps) {
             <Menu className="h-5 w-5" />
           </Button>
 
-          <h1 className="shrink-0 text-lg font-bold text-foreground md:text-xl">
-            {title}
-          </h1>
+          <div className="min-w-0 shrink">
+            <h1 className="truncate text-lg font-bold text-foreground md:text-xl">
+              {title}
+            </h1>
+            {isBrandedTenant(brand.slug) && (
+              <p className="hidden text-xs text-primary sm:block">
+                {user?.companyName ?? brand.name} Portal
+              </p>
+            )}
+          </div>
 
           <div className="hidden flex-1 justify-center px-4 md:flex">
             <SearchTrigger onClick={() => setSearchOpen(true)} />
@@ -74,7 +89,7 @@ export function AppShell({ children, title = "Dashboard" }: AppShellProps) {
             </Button>
             <Link
               href="/dashboard/profile"
-              className="flex items-center gap-2 border-l border-neutral-200 pl-2 sm:pl-3"
+              className="flex items-center gap-2 border-l border-border pl-2 sm:pl-3"
             >
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-primary text-xs text-white">
@@ -85,13 +100,16 @@ export function AppShell({ children, title = "Dashboard" }: AppShellProps) {
                 <p className="text-sm font-medium">{user?.name}</p>
                 <p className="text-xs text-muted-foreground">
                   {user?.role ? ROLE_LABELS[user.role] : ""}
+                  {user?.companyName ? ` · ${user.companyName}` : ""}
                 </p>
               </div>
             </Link>
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto bg-white p-4 md:p-6">{children}</main>
+        <main className="min-h-0 flex-1 overflow-y-auto bg-background p-4 md:p-6">
+          {children}
+        </main>
       </div>
     </div>
   );

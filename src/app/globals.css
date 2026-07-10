@@ -41,7 +41,7 @@
 :root {
   --radius: 0.5rem;
 
-  /* White / Black / Red theme */
+  /* White / Black / Red theme — InvestiHub default */
   --background: #ffffff;
   --foreground: #0a0a0a;
   --card: #ffffff;
@@ -72,6 +72,74 @@
   --status-reporting: #f87171;
   --status-submitted: #991b1b;
   --status-closed: #525252;
+}
+
+/* Allianz corporate theme — deep blue (#003781) */
+:root[data-tenant="allianz"] {
+  --background: #ffffff;
+  --foreground: #0a1628;
+  --card: #ffffff;
+  --card-foreground: #0a1628;
+  --popover: #ffffff;
+  --popover-foreground: #0a1628;
+  --primary: #003781;
+  --primary-foreground: #ffffff;
+  --secondary: #eef3f9;
+  --secondary-foreground: #0a1628;
+  --muted: #eef3f9;
+  --muted-foreground: #5a6b7d;
+  --accent: #e8f0fa;
+  --accent-foreground: #003781;
+  --destructive: #b91c1c;
+  --border: #d0dbe8;
+  --input: #d0dbe8;
+  --ring: #003781;
+
+  --sidebar: #003781;
+  --sidebar-foreground: #ffffff;
+  --sidebar-accent: #0050a8;
+
+  /* Status — Allianz blue palette */
+  --status-new: #003781;
+  --status-verification: #0050a8;
+  --status-field: #0070c0;
+  --status-reporting: #3d8fd1;
+  --status-submitted: #002456;
+  --status-closed: #5a6b7d;
+}
+
+/* Prudential corporate theme — logo red (#E81828) + logo gray (#687078) */
+:root[data-tenant="prudential"] {
+  --background: #ffffff;
+  --foreground: #2f353a;
+  --card: #ffffff;
+  --card-foreground: #2f353a;
+  --popover: #ffffff;
+  --popover-foreground: #2f353a;
+  --primary: #e81828;
+  --primary-foreground: #ffffff;
+  --secondary: #eef0f2;
+  --secondary-foreground: #2f353a;
+  --muted: #eef0f2;
+  --muted-foreground: #687078;
+  --accent: #fde9eb;
+  --accent-foreground: #e81828;
+  --destructive: #c41020;
+  --border: #d5d9dc;
+  --input: #d5d9dc;
+  --ring: #e81828;
+
+  --sidebar: #687078;
+  --sidebar-foreground: #ffffff;
+  --sidebar-accent: #e81828;
+
+  /* Status — Prudential red + gray */
+  --status-new: #e81828;
+  --status-verification: #c41020;
+  --status-field: #a50f1c;
+  --status-reporting: #f04a58;
+  --status-submitted: #8b0c18;
+  --status-closed: #687078;
 }
 
 @layer base {

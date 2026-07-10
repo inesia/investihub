@@ -7,7 +7,7 @@
 
 ## 1. Executive Summary
 
-**InvestiHub** adalah aplikasi web untuk manajemen klaim asuransi (Case Management System). Platform ini menghubungkan tiga peran utama — **Admin**, **Investigator**, dan **Client** — dalam satu workflow terpusat untuk melacak, menangani, dan menutup klaim asuransi.
+**InvestiHub** adalah aplikasi web untuk manajemen klaim asuransi (Case Management System). Platform ini menghubungkan tiga peran utama — **Admin**, **Investigator**, dan **Client** (perusahaan asuransi) — dalam satu workflow terpusat untuk melacak, menangani, dan menutup klaim asuransi. Pemegang polis (`insuredName`) hanya muncul sebagai data kasus yang diinvestigasi, bukan sebagai user platform.
 
 ### Value Proposition
 
@@ -60,8 +60,7 @@ flowchart TB
     INV --> SEARCH
     INV -->|Add notes| NOTES[Notes & Comments]
 
-    CLIENT -->|Own cases only| DASH
-    CLIENT -->|Submit claim| CASE
+    CLIENT -->|Own company cases| DASH
     CLIENT -->|Read + comment| NOTES
     CLIENT --> SEARCH
 ```
@@ -71,10 +70,10 @@ flowchart TB
 | Feature | Admin | Investigator | Client |
 |---------|:-----:|:------------:|:------:|
 | Kanban Board (all cases) | ✅ | ✅ | ⚠️ Own company only |
-| Create Case | ✅ | ✅ | ✅ |
+| Create Case | ✅ | ✅ | ❌ |
 | Assign Investigator | ✅ | ✅ | ❌ |
-| Set Initial Status | ✅ | ✅ | ❌ (default: NEW) |
-| Case Detail Page | ✅ | ✅ | ✅ |
+| Set Initial Status | ✅ | ✅ | ❌ |
+| Case Detail / Timeline | ✅ | ✅ | ✅ (read) |
 | Post Notes & Comments | ✅ | ✅ | ✅ |
 | Attachment (img/video/file) | ✅ | ✅ | ✅ |
 | Advanced Search | ✅ | ✅ | ✅ |
@@ -85,11 +84,21 @@ flowchart TB
 
 ## 4. Demo Accounts
 
-| Role | Email | Password |
-|------|-------|----------|
-| Investigator | `investigator@investihub.com` | `password123` |
-| Client | `client@investihub.com` | `password123` |
-| Admin | `admin@investihub.com` | `password123` |
+| Role | Email | Password | Notes |
+|------|-------|----------|-------|
+| Investigator | `investigator@investihub.com` | `password123` | Login: `/login` |
+| Client | `client@investihub.com` | `password123` | Rina Kusuma · PT Asuransi Sejahtera · `/login` |
+| Client (Allianz) | `client@allianz.co.id` | `password123` | Allianz portal · `/login/allianz` |
+| Client (Prudential) | `client@prudential.co.id` | `password123` | Prudential portal · `/login/prudential` |
+| Admin | `admin@investihub.com` | `password123` | Login: `/login` |
+
+### Client Portals
+
+| Portal | URL | Theme |
+|--------|-----|-------|
+| InvestiHub (default) | `/login` | Red / black |
+| Allianz exclusive | `/login/allianz` | Corporate blue + Allianz logo |
+| Prudential exclusive | `/login/prudential` | Logo red (#E81828) + gray (#687078) + Prudential logo |
 
 ---
 

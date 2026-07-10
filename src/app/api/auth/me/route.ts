@@ -22,6 +22,8 @@ export async function GET() {
       email: session.email,
       role: session.role,
       companyName: session.companyName,
+      clientId: session.clientId,
+      tenantSlug: session.tenantSlug,
     },
   });
 }

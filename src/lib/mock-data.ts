@@ -92,6 +92,40 @@ export const mockCases: CaseWithRelations[] = [
     client: { id: "client-002", name: "PT Allianz Indonesia", companyName: "PT Allianz Indonesia" },
     assignee: null,
   },
+  {
+    id: "case-008",
+    policyNumber: "POL-PRU-2024-1001",
+    insuredName: "Hendra Kusuma",
+    status: "VERIFICATION",
+    description: "Critical illness claim - documentation review",
+    createdAt: new Date("2024-06-08"),
+    updatedAt: new Date("2024-06-11"),
+    clientId: "client-003",
+    assigneeId: "inv-001",
+    client: {
+      id: "client-003",
+      name: "PT Prudential Life Assurance",
+      companyName: "PT Prudential Life Assurance",
+    },
+    assignee: { id: "inv-001", name: "Ahmad Rizki" },
+  },
+  {
+    id: "case-009",
+    policyNumber: "POL-PRU-2024-1002",
+    insuredName: "Maya Sari",
+    status: "FIELD",
+    description: "Life insurance claim - beneficiary verification",
+    createdAt: new Date("2024-06-09"),
+    updatedAt: new Date("2024-06-12"),
+    clientId: "client-003",
+    assigneeId: "inv-002",
+    client: {
+      id: "client-003",
+      name: "PT Prudential Life Assurance",
+      companyName: "PT Prudential Life Assurance",
+    },
+    assignee: { id: "inv-002", name: "Maria Gunawan" },
+  },
 ];
 
 export function getCaseById(id: string): CaseWithRelations | undefined {

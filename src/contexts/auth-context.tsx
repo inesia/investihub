@@ -9,13 +9,30 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import type { AuthUser } from "@/types";
+import {
+  getBrand,
+  isBrandedTenant,
+  resolveTenantSlug,
+  type TenantSlug,
+} from "@/lib/branding";
 
 interface AuthContextValue {
   user: AuthUser | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ error?: string }>;
+  login: (
+    email: string,
+    password: string,
+    options?: LoginOptions
+  ) => Promise<{ error?: string }>;
   register: (data: RegisterData) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
+}
+
+interface LoginOptions {
+  /** Where to go after success (default: /dashboard) */
+  redirectTo?: string;
+  /** Restrict login to a specific tenant portal */
+  requireTenant?: TenantSlug;
 }
 
 interface RegisterData {
@@ -49,7 +66,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchUser();
   }, [fetchUser]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (
+    email: string,
+    password: string,
+    options?: LoginOptions
+  ) => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -57,8 +78,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     const data = await res.json();
     if (!res.ok) return { error: data.error ?? "Login failed" };
-    setUser(data.user);
-    router.push("/dashboard");
+
+    const loggedIn = data.user as AuthUser;
+    if (options?.requireTenant) {
+      const tenant = resolveTenantSlug({
+        clientId: loggedIn.clientId,
+        companyName: loggedIn.companyName,
+        tenantSlug: loggedIn.tenantSlug,
+      });
+      if (tenant !== options.requireTenant) {
+        await fetch("/api/auth/logout", { method: "POST" });
+        const portalName = getBrand(options.requireTenant).name;
+        return {
+          error: `This portal is for ${portalName} clients only. Use InvestiHub Sign In instead.`,
+        };
+      }
+    }
+
+    setUser(loggedIn);
+    router.push(options?.redirectTo ?? "/dashboard");
     router.refresh();
     return {};
   };
@@ -78,9 +116,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    const tenant = resolveTenantSlug({
+      clientId: user?.clientId,
+      companyName: user?.companyName,
+      tenantSlug: user?.tenantSlug,
+    });
+    const loginPath = isBrandedTenant(tenant) ? `/login/${tenant}` : "/login";
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
-    router.push("/login");
+    router.push(loginPath);
     router.refresh();
   };
 

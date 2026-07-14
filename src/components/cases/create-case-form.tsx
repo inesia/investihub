@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FileText, Loader2, User } from "lucide-react";
@@ -14,6 +14,15 @@ import { Label } from "@/components/ui/label";
 import { mockInvestigators } from "@/lib/case-store";
 import { mockClients } from "@/lib/search";
 import { createCaseSchema, type CreateCaseInput } from "@/lib/validations/case";
+import {
+  AttachmentPicker,
+  createPendingAttachment,
+  pendingToCommentAttachment,
+  revokePendingAttachment,
+  type PendingAttachment,
+} from "@/components/cases/attachment-picker";
+import { validateFile } from "@/lib/note-utils";
+import { REGIONS_BY_PROVINCE } from "@/lib/indonesia-regions";
 
 export function CreateCaseForm() {
   const router = useRouter();
@@ -34,7 +43,56 @@ export function CreateCaseForm() {
     clientId: defaultClientId,
     assigneeId: "",
     status: "NEW",
+    city: "",
+    scheduleInvestigator: "",
+    documents: [],
   });
+
+  // Attachments Handling
+  const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const attachmentsRef = useRef<PendingAttachment[]>([]);
+  attachmentsRef.current = attachments;
+
+  useEffect(() => {
+    return () => {
+      attachmentsRef.current.forEach(revokePendingAttachment);
+    };
+  }, []);
+
+  const handleAddFiles = useCallback((files: FileList | File[]) => {
+    setUploadError(null);
+
+    const validFiles: File[] = [];
+    const errors: string[] = [];
+
+    Array.from(files).forEach((file) => {
+      const error = validateFile(file);
+      if (error) {
+        errors.push(error);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (errors.length > 0) {
+      setUploadError(errors.join(". "));
+    }
+
+    if (validFiles.length === 0) return;
+
+    const newAttachments = validFiles.map(createPendingAttachment);
+    setAttachments((prev) => [...prev, ...newAttachments]);
+  }, []);
+
+  const handleRemove = useCallback((id: string) => {
+    setAttachments((prev) => {
+      const removed = prev.find((a) => a.id === id);
+      if (removed) revokePendingAttachment(removed);
+      return prev.filter((a) => a.id !== id);
+    });
+    setUploadError(null);
+  }, []);
 
   const updateField = <K extends keyof CreateCaseInput>(
     key: K,
@@ -51,33 +109,42 @@ export function CreateCaseForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-
-    const payload: CreateCaseInput = {
-      ...form,
-      clientId:
-        user?.role === "CLIENT" ? (user.clientId ?? "client-001") : form.clientId,
-      assigneeId: form.assigneeId || undefined,
-      description: form.description || undefined,
-    };
-
-    const result = createCaseSchema.safeParse(payload);
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.issues.forEach((issue) => {
-        const key = issue.path[0]?.toString();
-        if (key) fieldErrors[key] = issue.message;
-      });
-      setErrors(fieldErrors);
-      return;
-    }
-
     setIsSubmitting(true);
+    setUploadError(null);
+
     try {
+      const persistedAttachments = await Promise.all(
+        attachments.map(pendingToCommentAttachment)
+      );
+
+      const payload: CreateCaseInput = {
+        ...form,
+        clientId:
+          user?.role === "CLIENT" ? (user.clientId ?? "client-001") : form.clientId,
+        assigneeId: form.assigneeId || undefined,
+        description: form.description || undefined,
+        city: form.city || undefined,
+        scheduleInvestigator: form.scheduleInvestigator || undefined,
+        documents: persistedAttachments,
+      };
+
+      const result = createCaseSchema.safeParse(payload);
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.issues.forEach((issue) => {
+          const key = issue.path[0]?.toString();
+          if (key) fieldErrors[key] = issue.message;
+        });
+        setErrors(fieldErrors);
+        setIsSubmitting(false);
+        return;
+      }
+
       const newCase = addCase(result.data);
+      attachments.forEach(revokePendingAttachment);
       router.push(`/dashboard/cases/${newCase.id}`);
     } catch {
       setErrors({ form: "Failed to create case. Please try again." });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -99,16 +166,16 @@ export function CreateCaseForm() {
             <FileText className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h2 className="text-lg font-bold">Case Information</h2>
+            <h2 className="text-lg font-bold">Informasi Kasus</h2>
             <p className="text-sm text-muted-foreground">
-              Fill in the claim details below
+              Isi detail klaim di bawah ini
             </p>
           </div>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <FormField
-            label="Policy Number"
+            label="Nomor Polis"
             required
             error={errors.policyNumber}
             className="sm:col-span-2"
@@ -121,7 +188,7 @@ export function CreateCaseForm() {
           </FormField>
 
           <FormField
-            label="Insured Name"
+            label="Nama Tertanggung"
             required
             error={errors.insuredName}
             className="sm:col-span-2"
@@ -129,13 +196,13 @@ export function CreateCaseForm() {
             <Input
               value={form.insuredName}
               onChange={(e) => updateField("insuredName", e.target.value)}
-              placeholder="Full name of the insured"
+              placeholder="Nama lengkap tertanggung"
             />
           </FormField>
 
           {canSelectClient ? (
             <FormField
-              label="Insurance Client"
+              label="Klien Asuransi"
               required
               error={errors.clientId}
               className="sm:col-span-2"
@@ -153,7 +220,7 @@ export function CreateCaseForm() {
               </select>
             </FormField>
           ) : (
-            <FormField label="Insurance Client" className="sm:col-span-2">
+            <FormField label="Klien Asuransi" className="sm:col-span-2">
               <Input
                 value={user?.companyName ?? "PT Asuransi Sejahtera"}
                 disabled
@@ -163,13 +230,13 @@ export function CreateCaseForm() {
           )}
 
           {canSelectAssignee && (
-            <FormField label="Assignee" error={errors.assigneeId}>
+            <FormField label="Petugas Investigator" error={errors.assigneeId}>
               <select
                 value={form.assigneeId ?? ""}
                 onChange={(e) => updateField("assigneeId", e.target.value)}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <option value="">Unassigned</option>
+                <option value="">Belum ditugaskan</option>
                 {mockInvestigators.map((inv) => (
                   <option key={inv.id} value={inv.id}>
                     {inv.name}
@@ -179,37 +246,67 @@ export function CreateCaseForm() {
             </FormField>
           )}
 
-          {(user?.role === "ADMIN" || user?.role === "INVESTIGATOR") && (
-            <FormField label="Initial Status" error={errors.status}>
-              <select
-                value={form.status}
-                onChange={(e) =>
-                  updateField("status", e.target.value as CaseStatus)
-                }
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {CASE_STATUS_COLUMNS.map((col) => (
-                  <option key={col.id} value={col.id}>
-                    {col.title}
-                  </option>
-                ))}
-              </select>
-            </FormField>
-          )}
+          <FormField
+            label="Kota / Kabupaten"
+            required
+            error={errors.city}
+            className="sm:col-span-2"
+          >
+            <select
+              value={form.city}
+              onChange={(e) => updateField("city", e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <option value="">Pilih Kota / Kabupaten...</option>
+              {Object.entries(REGIONS_BY_PROVINCE).map(([province, regions]) => (
+                <optgroup key={province} label={province}>
+                  {regions.map((reg) => (
+                    <option key={`${province}-${reg.name}`} value={`${reg.name}, ${province}`}>
+                      {reg.name}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </FormField>
 
           <FormField
-            label="Description"
+            label="Jadwal Keberangkatan Investigator"
+            error={errors.scheduleInvestigator}
+            className="sm:col-span-2"
+          >
+            <Input
+              type="datetime-local"
+              value={form.scheduleInvestigator}
+              onChange={(e) => updateField("scheduleInvestigator", e.target.value)}
+            />
+          </FormField>
+
+          <FormField
+            label="Deskripsi"
             error={errors.description}
             className="sm:col-span-2"
           >
             <textarea
               value={form.description ?? ""}
               onChange={(e) => updateField("description", e.target.value)}
-              placeholder="Describe the claim (accident details, damage type, etc.)"
+              placeholder="Deskripsikan klaim (detail kejadian, jenis kerusakan, dll.)"
               rows={4}
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </FormField>
+
+          <div className="sm:col-span-2 border-t border-neutral-100 pt-4 mt-2">
+            <Label className="mb-2 block text-sm font-semibold text-neutral-800">
+              Upload Dokumen (Lampiran berkas klaim / foto)
+            </Label>
+            <AttachmentPicker
+              attachments={attachments}
+              onAdd={handleAddFiles}
+              onRemove={handleRemove}
+              error={uploadError}
+            />
+          </div>
         </div>
       </div>
 
@@ -226,7 +323,7 @@ export function CreateCaseForm() {
           onClick={() => router.push("/dashboard")}
           disabled={isSubmitting}
         >
-          Cancel
+          Batal
         </Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? (
@@ -234,7 +331,7 @@ export function CreateCaseForm() {
           ) : (
             <User className="mr-2 h-4 w-4" />
           )}
-          Create Case
+          Buat Kasus
         </Button>
       </div>
     </motion.form>

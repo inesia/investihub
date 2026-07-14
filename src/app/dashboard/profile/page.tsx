@@ -28,7 +28,7 @@ export default function ProfilePage() {
         : "bg-red-50 text-red-900 border-red-300";
 
   return (
-    <AppShell title="My Profile">
+    <AppShell title="Profil Saya">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -75,19 +75,19 @@ export default function ProfilePage() {
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <InfoItem icon={Mail} label="Email" value={user.email} />
-              <InfoItem icon={User} label="Role" value={ROLE_LABELS[user.role]} />
+              <InfoItem icon={User} label="Peran" value={ROLE_LABELS[user.role]} />
               {user.companyName && (
                 <InfoItem
                   icon={Building2}
-                  label="Company"
+                  label="Perusahaan"
                   value={user.companyName}
                 />
               )}
-              <InfoItem icon={Shield} label="User ID" value={user.id} />
+              <InfoItem icon={Shield} label="ID Pengguna" value={user.id} />
               {brand.slug !== "default" && (
                 <InfoItem
                   icon={Palette}
-                  label="Portal Theme"
+                  label="Tema Portal"
                   value={`${brand.name} Corporate`}
                 />
               )}
@@ -96,12 +96,12 @@ export default function ProfilePage() {
             <div className="rounded-lg border border-dashed border-border bg-muted/50 p-4">
               <p className="text-sm font-medium text-foreground">
                 {user.role === "INVESTIGATOR"
-                  ? "As an Investigator, you can manage cases, update statuses, and post investigation notes."
+                  ? "Sebagai Investigator, Anda dapat mengelola kasus, memperbarui status, dan memposting catatan investigasi."
                   : user.role === "CLIENT" && isBrandedTenant(brand.slug)
-                    ? `${brand.name} Claim Investigation Portal — view your cases, follow the reporting timeline, and leave comments. Creating new cases is handled by InvestiHub.`
+                    ? `${brand.name} Portal Investigasi Klaim — lihat kasus Anda, ikuti timeline pelaporan, dan tinggalkan komentar. Pembuatan kasus baru ditangani oleh InvestiHub.`
                     : user.role === "CLIENT"
-                      ? "As a Client, you can view your cases, follow the reporting timeline, and leave comments. Creating new cases is not available for this role."
-                      : "As an Administrator, you have full access to manage clients, cases, and users."}
+                      ? "Sebagai Klien, Anda dapat melihat kasus Anda, mengikuti timeline pelaporan, dan meninggalkan komentar. Membuat kasus baru tidak tersedia untuk peran ini."
+                      : "Sebagai Administrator, Anda memiliki akses penuh untuk mengelola klien, kasus, dan pengguna."}
               </p>
             </div>
           </CardContent>

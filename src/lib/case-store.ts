@@ -23,13 +23,24 @@ function reviveCase(stored: StoredCase): CaseWithRelations {
   };
 }
 
+const LEGACY_STATUS_MAP: Record<string, "NEW" | "ON_PROGRESS" | "CLOSED"> = {
+  VERIFICATION: "ON_PROGRESS",
+  FIELD: "ON_PROGRESS",
+  REPORTING: "ON_PROGRESS",
+  SUBMITTED: "ON_PROGRESS",
+};
+
 function loadStoredCases(): CaseWithRelations[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as StoredCase[];
-    return parsed.map(reviveCase);
+    return parsed.map((c) => {
+      // Migrate old statuses to new 3-step system
+      const migratedStatus = LEGACY_STATUS_MAP[c.status] ?? c.status;
+      return reviveCase({ ...c, status: migratedStatus as StoredCase["status"] });
+    });
   } catch {
     return [];
   }
@@ -76,6 +87,9 @@ export function createCase(input: CreateCaseInput): CaseWithRelations {
       companyName: client?.name ?? null,
     },
     assignee: assignee,
+    city: input.city || null,
+    scheduleInvestigator: input.scheduleInvestigator || null,
+    documents: input.documents || [],
   };
 
   const stored = loadStoredCases();

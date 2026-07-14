@@ -30,13 +30,13 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   {
-    label: "New Case",
+    label: "Kasus Baru",
     href: "/dashboard/cases/new",
     icon: PlusCircle,
     roles: ["ADMIN", "INVESTIGATOR"],
   },
-  { label: "Clients", href: "/dashboard/clients", icon: Users, roles: ["ADMIN"] },
-  { label: "Profile", href: "/dashboard/profile", icon: UserCircle },
+  { label: "Klien", href: "/dashboard/clients", icon: Users, roles: ["ADMIN"] },
+  { label: "Profil", href: "/dashboard/profile", icon: UserCircle },
 ];
 
 interface SidebarProps {
@@ -130,7 +130,7 @@ export function Sidebar({
             )}
           >
             <LogOut className="h-4 w-4 shrink-0" />
-            {!isCollapsed && <span>Sign Out</span>}
+            {!isCollapsed && <span>Keluar</span>}
           </button>
         </div>
 
@@ -183,7 +183,7 @@ export function Sidebar({
 
       <aside
         className={cn(
-          "sticky top-0 hidden h-dvh shrink-0 self-start transition-all duration-300 lg:block",
+          "hidden h-dvh shrink-0 overflow-hidden transition-all duration-300 lg:block",
           isCollapsed ? "w-[68px]" : "w-[260px]"
         )}
       >

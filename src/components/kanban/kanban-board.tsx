@@ -23,7 +23,7 @@ export function KanbanBoard({ cases }: KanbanBoardProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="inline-flex min-w-full gap-3 p-1 md:grid md:grid-cols-2 md:gap-4 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6"
+        className="inline-flex min-w-full gap-3 p-1 md:grid md:grid-cols-3 md:gap-4"
       >
         {CASE_STATUS_COLUMNS.map((column, index) => (
           <motion.div

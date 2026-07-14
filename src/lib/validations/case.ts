@@ -14,12 +14,12 @@ export const createCaseSchema = z.object({
   assigneeId: z.string().optional(),
   status: z.enum([
     "NEW",
-    "VERIFICATION",
-    "FIELD",
-    "REPORTING",
-    "SUBMITTED",
+    "ON_PROGRESS",
     "CLOSED",
   ]),
+  city: z.string().min(1, "Please select a city/regency").optional(),
+  scheduleInvestigator: z.string().optional(),
+  documents: z.array(z.any()).optional(),
 });
 
 export type CreateCaseInput = z.infer<typeof createCaseSchema>;

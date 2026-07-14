@@ -15,10 +15,7 @@ enum Role {
 
 enum CaseStatus {
   NEW
-  VERIFICATION
-  FIELD
-  REPORTING
-  SUBMITTED
+  ON_PROGRESS
   CLOSED
 }
 

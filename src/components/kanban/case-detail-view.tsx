@@ -9,11 +9,14 @@ import {
   FileText,
   MessageSquare,
   User,
+  MapPin,
+  CalendarDays,
+  Paperclip,
 } from "lucide-react";
 import type { CaseWithRelations, CommentWithAuthor } from "@/types";
 import { STATUS_LABELS, canPostComments } from "@/types";
 import { StatusBadge } from "@/components/kanban/status-badge";
-import { CommentItem } from "@/components/cases/comment-item";
+import { CommentItem, AttachmentDisplay } from "@/components/cases/comment-item";
 import { NoteForm, type NoteFormData } from "@/components/cases/note-form";
 import { useAuth } from "@/contexts/auth-context";
 import { formatDate, formatDateTime } from "@/lib/utils";
@@ -129,19 +132,33 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
 
       <section>
         <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          Case Details
+          Detail Kasus
         </h3>
         <div className="grid gap-4 rounded-xl border border-neutral-200 p-5 sm:grid-cols-2 lg:grid-cols-3">
-          <DetailRow icon={User} label="Insured Name" value={caseData.insuredName} />
+          <DetailRow icon={User} label="Nama Tertanggung" value={caseData.insuredName} />
           <DetailRow
             icon={Building2}
-            label="Insurance Company"
+            label="Perusahaan Asuransi"
             value={caseData.client.companyName ?? caseData.client.name}
           />
           <DetailRow
             icon={User}
-            label="Assignee"
-            value={caseData.assignee?.name ?? "Unassigned"}
+            label="Investigator"
+            value={caseData.assignee?.name ?? "Belum ditugaskan"}
+          />
+          <DetailRow
+            icon={MapPin}
+            label="Kota / Kabupaten"
+            value={caseData.city ?? "Tidak ditentukan"}
+          />
+          <DetailRow
+            icon={CalendarDays}
+            label="Jadwal Keberangkatan"
+            value={
+              caseData.scheduleInvestigator
+                ? formatDateTime(caseData.scheduleInvestigator)
+                : "Belum dijadwalkan"
+            }
           />
           <DetailRow
             icon={FileText}
@@ -150,18 +167,30 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
           />
           <DetailRow
             icon={Calendar}
-            label="Created"
+            label="Dibuat"
             value={formatDate(caseData.createdAt)}
           />
           <DetailRow
             icon={Clock}
-            label="Last Updated"
+            label="Terakhir Diperbarui"
             value={formatDate(caseData.updatedAt)}
           />
           {caseData.description && (
             <div className="col-span-full border-t border-neutral-200 pt-4">
-              <p className="mb-1 text-xs text-muted-foreground">Description</p>
+              <p className="mb-1 text-xs text-muted-foreground">Deskripsi</p>
               <p className="text-sm leading-relaxed">{caseData.description}</p>
+            </div>
+          )}
+          {caseData.documents && caseData.documents.length > 0 && (
+            <div className="col-span-full border-t border-neutral-200 pt-4">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Paperclip className="h-3.5 w-3.5" /> Case Documents
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {caseData.documents.map((doc) => (
+                  <AttachmentDisplay key={doc.id} attachment={doc} />
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -169,7 +198,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
 
       <section>
         <h3 className="mb-5 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          Timeline History
+          Riwayat Timeline
         </h3>
         <div className="space-y-0">
           {mockTimeline.map((event, index) => (
@@ -208,7 +237,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
       <section className="pb-8">
         <h3 className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
           <MessageSquare className="h-4 w-4" />
-          Notes & Comments
+          Catatan &amp; Komentar
         </h3>
 
         {canComment && (
@@ -217,10 +246,10 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
               onSubmit={handleSubmitNote}
               placeholder={
                 user?.role === "CLIENT"
-                  ? "Write a note or attach evidence..."
-                  : "Add investigation note..."
+                  ? "Tulis catatan atau lampirkan bukti..."
+                  : "Tambahkan catatan investigasi..."
               }
-              submitLabel="Post Note"
+              submitLabel="Posting Catatan"
             />
           </div>
         )}
@@ -228,7 +257,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
         <div className="space-y-3">
           {comments.length === 0 ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
-              No notes yet. Be the first to add one.
+              Belum ada catatan. Jadilah yang pertama menambahkan.
             </p>
           ) : (
             comments.map((comment, index) => (
@@ -239,7 +268,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
 
         {!canComment && (
           <p className="mt-5 text-center text-sm text-muted-foreground">
-            Sign in as a Client or Investigator to add notes
+            Masuk sebagai Klien atau Investigator untuk menambahkan catatan
           </p>
         )}
       </section>

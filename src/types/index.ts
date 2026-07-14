@@ -33,6 +33,9 @@ export interface CaseWithRelations {
     id: string;
     name: string;
   } | null;
+  city?: string | null;
+  scheduleInvestigator?: string | null;
+  documents?: CommentAttachment[] | null;
 }
 
 export interface ActivityLogWithAuthor {
@@ -78,37 +81,28 @@ export interface KanbanColumn {
 }
 
 export const CASE_STATUS_COLUMNS: KanbanColumn[] = [
-  { id: "NEW", title: "New", color: "bg-status-new" },
-  { id: "VERIFICATION", title: "Verification", color: "bg-status-verification" },
-  { id: "FIELD", title: "Field", color: "bg-status-field" },
-  { id: "REPORTING", title: "Reporting", color: "bg-status-reporting" },
-  { id: "SUBMITTED", title: "Submitted", color: "bg-status-submitted" },
-  { id: "CLOSED", title: "Closed", color: "bg-status-closed" },
+  { id: "NEW", title: "New Case", color: "bg-blue-400" },
+  { id: "ON_PROGRESS", title: "On Progress", color: "bg-amber-400" },
+  { id: "CLOSED", title: "Closed", color: "bg-neutral-400" },
 ];
 
 export const STATUS_LABELS: Record<CaseStatus, string> = {
-  NEW: "New",
-  VERIFICATION: "Verification",
-  FIELD: "Field",
-  REPORTING: "Reporting",
-  SUBMITTED: "Submitted",
+  NEW: "New Case",
+  ON_PROGRESS: "On Progress",
   CLOSED: "Closed",
 };
 
 /** Theme-aware badges — use primary/accent tokens so Allianz blue theme applies */
 export const STATUS_BADGE_STYLES: Record<CaseStatus, string> = {
-  NEW: "bg-accent text-primary border-primary/20",
-  VERIFICATION: "bg-primary/10 text-primary border-primary/30",
-  FIELD: "bg-accent text-foreground border-primary/40",
-  REPORTING: "bg-primary/5 text-primary/80 border-primary/20",
-  SUBMITTED: "bg-primary/15 text-primary border-primary/40",
+  NEW: "bg-blue-50 text-blue-700 border-blue-200",
+  ON_PROGRESS: "bg-amber-50 text-amber-700 border-amber-200",
   CLOSED: "bg-neutral-100 text-neutral-600 border-neutral-300",
 };
 
 export const ROLE_LABELS: Record<Role, string> = {
   ADMIN: "Administrator",
   INVESTIGATOR: "Investigator",
-  CLIENT: "Client",
+  CLIENT: "Klien",
 };
 
 /** Roles that may post notes & comments on a case */

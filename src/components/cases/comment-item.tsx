@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Download, FileText } from "lucide-react";
-import type { CommentWithAuthor } from "@/types";
+import type { CommentWithAuthor, CommentAttachment } from "@/types";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDateTime, getInitials } from "@/lib/utils";
 import { formatFileSize, sanitizeHtml } from "@/lib/note-utils";
@@ -60,10 +60,10 @@ export function CommentItem({ comment, index = 0 }: CommentItemProps) {
   );
 }
 
-function AttachmentDisplay({
+export function AttachmentDisplay({
   attachment,
 }: {
-  attachment: NonNullable<CommentWithAuthor["attachments"]>[number];
+  attachment: CommentAttachment;
 }) {
   if (attachment.type === "image") {
     return (

@@ -48,12 +48,12 @@ export default function LoginForm() {
         </div>
         <div>
           <h2 className="text-4xl font-bold leading-tight text-white">
-            Insurance Claim
+            Manajemen Klaim
             <br />
-            <span className="text-primary">Management</span>
+            <span className="text-primary">Asuransi</span>
           </h2>
           <p className="mt-4 max-w-md text-white/60">
-            Streamline your investigation workflow with our comprehensive case management platform.
+            Sederhanakan alur investigasi Anda dengan platform manajemen kasus kami yang komprehensif.
           </p>
         </div>
         <div className="space-y-3">
@@ -76,14 +76,14 @@ export default function LoginForm() {
             <PoweredByOperator />
           </div>
 
-          <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
+          <h1 className="text-2xl font-bold text-foreground">Selamat datang</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Sign in to access your dashboard
+            Masuk untuk mengakses dashboard Anda
           </p>
 
           {searchParams.get("callbackUrl") && (
             <p className="mt-3 rounded-md bg-accent px-3 py-2 text-xs text-primary">
-              Please sign in to continue
+              Silakan masuk untuk melanjutkan
             </p>
           )}
 
@@ -106,7 +106,7 @@ export default function LoginForm() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder="Masukkan kata sandi Anda"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -136,14 +136,14 @@ export default function LoginForm() {
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                "Sign In"
+                "Masuk"
               )}
             </Button>
           </form>
 
           <div className="mt-6 space-y-3 rounded-lg border border-dashed border-neutral-200 p-4">
             <p className="text-xs font-medium text-muted-foreground">
-              Demo accounts (password: password123):
+              Akun demo (password: password123):
             </p>
             <div className="grid gap-2">
               <button
@@ -182,7 +182,7 @@ export default function LoginForm() {
           <div className="mt-4 space-y-3">
             <div className="rounded-lg border border-[#003781]/20 bg-[#003781]/5 p-4">
               <p className="text-xs font-medium text-[#003781]">
-                Allianz Indonesia client?
+                Klien Allianz Indonesia?
               </p>
               <Link
                 href="/login/allianz"
@@ -193,13 +193,13 @@ export default function LoginForm() {
                   variant="mark"
                   markClassName="h-5 w-auto max-w-[64px]"
                 />
-                Open Allianz Client Portal →
+                Buka Portal Klien Allianz →
               </Link>
             </div>
 
             <div className="rounded-lg border border-[#687078]/25 bg-[#687078]/5 p-4">
               <p className="text-xs font-medium text-[#687078]">
-                Prudential Indonesia client?
+                Klien Prudential Indonesia?
               </p>
               <Link
                 href="/login/prudential"
@@ -210,15 +210,15 @@ export default function LoginForm() {
                   variant="mark"
                   markClassName="h-5 w-auto max-w-[72px]"
                 />
-                Open Prudential Client Portal →
+                Buka Portal Klien Prudential →
               </Link>
             </div>
           </div>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            Belum punya akun?{" "}
             <Link href="/register" className="font-semibold text-primary hover:underline">
-              Register
+              Daftar
             </Link>
           </p>
         </motion.div>

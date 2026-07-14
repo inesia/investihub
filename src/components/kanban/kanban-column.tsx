@@ -58,14 +58,7 @@ export function groupCasesByStatus(
 ): Record<CaseStatus, CaseWithRelations[]> {
   const grouped = {} as Record<CaseStatus, CaseWithRelations[]>;
 
-  for (const status of [
-    "NEW",
-    "VERIFICATION",
-    "FIELD",
-    "REPORTING",
-    "SUBMITTED",
-    "CLOSED",
-  ] as CaseStatus[]) {
+  for (const status of ["NEW", "ON_PROGRESS", "CLOSED"] as CaseStatus[]) {
     grouped[status] = cases.filter((c) => c.status === status);
   }
 

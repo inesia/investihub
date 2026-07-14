@@ -69,18 +69,18 @@ function DashboardContent() {
 
   const subtitle =
     user?.role === "CLIENT"
-      ? "Track your claim cases, review timeline progress, and leave comments"
-      : "Track and manage insurance claim cases across all stages";
+      ? "Pantau kasus klaim Anda, tinjau progres, dan tinggalkan komentar"
+      : "Pantau dan kelola kasus klaim asuransi di semua tahap";
 
   return (
-    <AppShell title="Case Board">
+    <AppShell title="Papan Kasus">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">{subtitle}</p>
         {allowCreate && (
           <Button asChild size="sm" className="shrink-0">
             <Link href="/dashboard/cases/new">
               <Plus className="mr-2 h-4 w-4" />
-              New Case
+              Kasus Baru
             </Link>
           </Button>
         )}
@@ -94,25 +94,25 @@ function DashboardContent() {
 
       {hasActiveFilters(filters) && (
         <p className="mb-4 text-sm text-muted-foreground">
-          Showing {filteredCases.length} of {baseCases.length} cases
+          Menampilkan {filteredCases.length} dari {baseCases.length} kasus
         </p>
       )}
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading cases...</p>
+        <p className="text-sm text-muted-foreground">Memuat kasus...</p>
       ) : filteredCases.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-neutral-200 py-16 text-center">
-          <p className="font-medium">No cases match your search</p>
+          <p className="font-medium">Tidak ada kasus yang cocok</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {user?.role === "CLIENT"
-              ? "Try adjusting filters, or check back later for updates"
-              : "Try adjusting filters or create a new case"}
+              ? "Coba sesuaikan filter, atau periksa kembali nanti"
+              : "Coba sesuaikan filter atau buat kasus baru"}
           </p>
           {allowCreate && (
             <Button asChild className="mt-4" size="sm">
               <Link href="/dashboard/cases/new">
                 <Plus className="mr-2 h-4 w-4" />
-                Create Case
+                Buat Kasus
               </Link>
             </Button>
           )}
@@ -128,8 +128,8 @@ export default function DashboardPage() {
   return (
     <Suspense
       fallback={
-        <AppShell title="Case Board">
-          <div className="text-sm text-muted-foreground">Loading...</div>
+        <AppShell title="Papan Kasus">
+          <div className="text-sm text-muted-foreground">Memuat...</div>
         </AppShell>
       }
     >

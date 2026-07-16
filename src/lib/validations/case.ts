@@ -20,6 +20,27 @@ export const createCaseSchema = z.object({
   city: z.string().min(1, "Please select a city/regency").optional(),
   scheduleInvestigator: z.string().optional(),
   documents: z.array(z.any()).optional(),
+  
+  // Custom Claim Form Fields
+  claimType: z.string().optional(),
+  policyHolder: z.string().optional(),
+  applicationDate: z.string().optional(),
+  activeDate: z.string().optional(),
+  basicCoverage: z.string().optional(),
+  wop: z.string().optional(),
+  flexiCi: z.string().optional(),
+  addb: z.string().optional(),
+  premium: z.string().optional(),
+  policyAge: z.string().optional(),
+  beneficiary: z.string().optional(),
+  treatmentDate: z.string().optional(),
+  treatmentPlace: z.string().optional(),
+  diagnosis: z.string().optional(),
+  agentName: z.string().optional(),
+  addressKtp: z.string().optional(),
+  addressSpaj: z.string().optional(),
+  investigationTargets: z.array(z.string()).optional(),
+  documentChecklist: z.array(z.string()).optional(),
 });
 
 export type CreateCaseInput = z.infer<typeof createCaseSchema>;

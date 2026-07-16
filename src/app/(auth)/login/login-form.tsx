@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft, Shield, Search } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { PoweredByOperator } from "@/components/brand/powered-by-operator";
@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 export default function LoginForm() {
   const { login } = useAuth();
   const searchParams = useSearchParams();
+  const [step, setStep] = useState<"role" | "login">("role");
+  const [selectedRole, setSelectedRole] = useState<string>("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -27,14 +29,18 @@ export default function LoginForm() {
     setIsLoading(true);
 
     const result = await login(email, password);
-    if (result.error) setError(result.error);
-    setIsLoading(false);
+    if (result.error) {
+      setError(result.error);
+      setIsLoading(false);
+    }
   };
 
-  const fillDemo = (demoEmail: string) => {
+  const selectRole = (role: string, demoEmail: string) => {
+    setSelectedRole(role);
     setEmail(demoEmail);
     setPassword("password123");
     setError("");
+    setStep("login");
   };
 
   return (
@@ -66,6 +72,7 @@ export default function LoginForm() {
 
       <div className="flex flex-1 items-center justify-center bg-white p-6">
         <motion.div
+          key={step}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
@@ -76,151 +83,146 @@ export default function LoginForm() {
             <PoweredByOperator />
           </div>
 
-          <h1 className="text-2xl font-bold text-foreground">Selamat datang</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Masuk untuk mengakses dashboard Anda
-          </p>
+          {step === "role" ? (
+            <>
+              <h1 className="text-2xl font-bold text-foreground">Pilih Peran Anda</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Silakan pilih bagaimana Anda ingin masuk
+              </p>
 
-          {searchParams.get("callbackUrl") && (
-            <p className="mt-3 rounded-md bg-accent px-3 py-2 text-xs text-primary">
-              Silakan masuk untuk melanjutkan
-            </p>
-          )}
+              {searchParams.get("callbackUrl") && (
+                <p className="mt-3 rounded-md bg-accent px-3 py-2 text-xs text-primary">
+                  Silakan masuk untuk melanjutkan
+                </p>
+              )}
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Masukkan kata sandi Anda"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="pr-10"
-                />
+              <div className="mt-8 space-y-4">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => selectRole("Administrator", "admin@investihub.com")}
+                  className="flex w-full items-center gap-4 rounded-xl border border-neutral-200 p-4 text-left transition-all hover:border-primary hover:bg-neutral-50"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
+                    <Shield className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">Administrator</h3>
+                    <p className="text-sm text-muted-foreground">Masuk sebagai admin sistem</p>
+                  </div>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => selectRole("Investigator", "investigator@investihub.com")}
+                  className="flex w-full items-center gap-4 rounded-xl border border-[#7c3aed]/20 bg-[#7c3aed]/5 p-4 text-left transition-all hover:bg-[#7c3aed]/10"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm text-[#7c3aed]">
+                    <Search className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-[#7c3aed]">Investigator</h3>
+                    <p className="text-sm text-[#7c3aed]/70">Masuk untuk mengelola kasus</p>
+                  </div>
+                </button>
+
+                <Link
+                  href="/login/allianz"
+                  className="flex w-full items-center gap-4 rounded-xl border border-[#003781]/20 bg-[#003781]/5 p-4 text-left transition-all hover:bg-[#003781]/10"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm">
+                    <BrandLogo tenant="allianz" variant="mark" markClassName="h-6 w-auto max-w-[40px]" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-[#003781]">Klien Allianz</h3>
+                    <p className="text-sm text-[#003781]/70">Portal khusus klien Allianz</p>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/login/prudential"
+                  className="flex w-full items-center gap-4 rounded-xl border border-[#E81828]/20 bg-[#E81828]/5 p-4 text-left transition-all hover:bg-[#E81828]/10"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm">
+                    <BrandLogo tenant="prudential" variant="mark" markClassName="h-6 w-auto max-w-[40px]" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-[#E81828]">Klien Prudential</h3>
+                    <p className="text-sm text-[#E81828]/70">Portal khusus klien Prudential</p>
+                  </div>
+                </Link>
               </div>
-            </div>
-
-            {error && (
-              <p className="rounded-md bg-accent px-3 py-2 text-sm text-primary">
-                {error}
-              </p>
-            )}
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Masuk"
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-6 space-y-3 rounded-lg border border-dashed border-neutral-200 p-4">
-            <p className="text-xs font-medium text-muted-foreground">
-              Akun demo (password: password123):
-            </p>
-            <div className="grid gap-2">
+            </>
+          ) : (
+            <>
               <button
                 type="button"
-                onClick={() => fillDemo("investigator@investihub.com")}
-                className="rounded-md border border-neutral-200 px-3 py-2 text-left text-xs transition-colors hover:bg-neutral-50"
+                onClick={() => setStep("role")}
+                className="mb-6 flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
               >
-                <span className="font-medium text-foreground">Investigator</span>
-                <span className="mt-0.5 block text-muted-foreground">
-                  investigator@investihub.com
-                </span>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Kembali
               </button>
-              <button
-                type="button"
-                onClick={() => fillDemo("client@investihub.com")}
-                className="rounded-md border border-neutral-200 px-3 py-2 text-left text-xs transition-colors hover:bg-neutral-50"
-              >
-                <span className="font-medium text-foreground">Client — Sejahtera</span>
-                <span className="mt-0.5 block text-muted-foreground">
-                  client@investihub.com
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemo("admin@investihub.com")}
-                className="rounded-md border border-neutral-200 px-3 py-2 text-left text-xs transition-colors hover:bg-neutral-50"
-              >
-                <span className="font-medium text-foreground">Admin</span>
-                <span className="mt-0.5 block text-muted-foreground">
-                  admin@investihub.com
-                </span>
-              </button>
-            </div>
-          </div>
 
-          <div className="mt-4 space-y-3">
-            <div className="rounded-lg border border-[#003781]/20 bg-[#003781]/5 p-4">
-              <p className="text-xs font-medium text-[#003781]">
-                Klien Allianz Indonesia?
+              <h1 className="text-2xl font-bold text-foreground">Masuk sebagai {selectedRole}</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Gunakan kredensial demo untuk melanjutkan
               </p>
-              <Link
-                href="/login/allianz"
-                className="mt-2 flex items-center gap-2 text-sm font-semibold text-[#003781] hover:underline"
-              >
-                <BrandLogo
-                  tenant="allianz"
-                  variant="mark"
-                  markClassName="h-5 w-auto max-w-[64px]"
-                />
-                Buka Portal Klien Allianz →
-              </Link>
-            </div>
 
-            <div className="rounded-lg border border-[#687078]/25 bg-[#687078]/5 p-4">
-              <p className="text-xs font-medium text-[#687078]">
-                Klien Prudential Indonesia?
-              </p>
-              <Link
-                href="/login/prudential"
-                className="mt-2 flex items-center gap-2 text-sm font-semibold text-[#E81828] hover:underline"
-              >
-                <BrandLogo
-                  tenant="prudential"
-                  variant="mark"
-                  markClassName="h-5 w-auto max-w-[72px]"
-                />
-                Buka Portal Klien Prudential →
-              </Link>
-            </div>
-          </div>
+              <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@company.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            Belum punya akun?{" "}
-            <Link href="/register" className="font-semibold text-primary hover:underline">
-              Daftar
-            </Link>
-          </p>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Masukkan kata sandi Anda"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {error && (
+                  <p className="rounded-md bg-accent px-3 py-2 text-sm text-primary">
+                    {error}
+                  </p>
+                )}
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Masuk"
+                  )}
+                </Button>
+              </form>
+            </>
+          )}
         </motion.div>
       </div>
     </div>

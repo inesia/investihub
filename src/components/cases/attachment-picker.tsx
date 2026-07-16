@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { FileText, Image as ImageIcon, Paperclip, Video, X } from "lucide-react";
+import { FileText, Image as ImageIcon, Paperclip, Video, X, Plus } from "lucide-react";
 import type { CommentAttachment } from "@/types";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -16,12 +16,15 @@ export interface PendingAttachment {
   file: File;
   previewUrl: string;
   type: CommentAttachment["type"];
+  caption?: string;
 }
 
 interface AttachmentPickerProps {
   attachments: PendingAttachment[];
   onAdd: (files: FileList | File[]) => void;
   onRemove: (id: string) => void;
+  onCaptionChange?: (id: string, caption: string) => void;
+  onReplace?: (id: string, file: File) => void;
   error?: string | null;
   className?: string;
 }
@@ -30,6 +33,8 @@ export function AttachmentPicker({
   attachments,
   onAdd,
   onRemove,
+  onCaptionChange,
+  onReplace,
   error,
   className,
 }: AttachmentPickerProps) {
@@ -141,8 +146,18 @@ export function AttachmentPicker({
               key={att.id}
               attachment={att}
               onRemove={() => onRemove(att.id)}
+              onCaptionChange={onCaptionChange}
+              onReplace={onReplace}
             />
           ))}
+          {/* Dash Trigger to add more files directly */}
+          <label
+            htmlFor={imageId}
+            className="flex flex-col items-center justify-center border border-dashed border-neutral-300 rounded-lg bg-neutral-50/30 hover:bg-neutral-50/80 p-3 cursor-pointer min-h-[90px] transition-colors"
+          >
+            <Plus className="h-5 w-5 text-neutral-400 mb-1" />
+            <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">Tambah Gambar / File</span>
+          </label>
         </div>
       )}
     </div>
@@ -152,12 +167,16 @@ export function AttachmentPicker({
 function AttachmentPreviewCard({
   attachment,
   onRemove,
+  onCaptionChange,
+  onReplace,
 }: {
   attachment: PendingAttachment;
   onRemove: () => void;
+  onCaptionChange?: (id: string, caption: string) => void;
+  onReplace?: (id: string, file: File) => void;
 }) {
   return (
-    <div className="relative flex items-center gap-3 rounded-lg border border-neutral-200 bg-white p-2">
+    <div className="relative flex flex-col gap-2 rounded-lg border border-neutral-200 bg-white p-3">
       <button
         type="button"
         onClick={onRemove}
@@ -166,36 +185,73 @@ function AttachmentPreviewCard({
         <X className="h-3 w-3" />
       </button>
 
-      {attachment.type === "image" && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={attachment.previewUrl}
-          alt={attachment.file.name}
-          className="h-14 w-14 shrink-0 rounded-md object-cover"
-          onError={(e) => {
-            e.currentTarget.style.display = "none";
-          }}
-        />
-      )}
-      {attachment.type === "video" && (
-        <video
-          src={attachment.previewUrl}
-          muted
-          className="h-14 w-14 shrink-0 rounded-md object-cover"
-        />
-      )}
-      {attachment.type === "file" && (
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-neutral-100">
-          <FileText className="h-6 w-6 text-neutral-500" />
-        </div>
-      )}
+      <div className="flex items-center gap-3">
+        {attachment.type === "image" && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={attachment.previewUrl}
+            alt={attachment.file.name}
+            className="h-14 w-14 shrink-0 rounded-md object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        )}
+        {attachment.type === "video" && (
+          <video
+            src={attachment.previewUrl}
+            muted
+            className="h-14 w-14 shrink-0 rounded-md object-cover"
+          />
+        )}
+        {attachment.type === "file" && (
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-neutral-100">
+            <FileText className="h-6 w-6 text-neutral-500" />
+          </div>
+        )}
 
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-medium">{attachment.file.name}</p>
-        <p className="text-[10px] capitalize text-muted-foreground">
-          {attachment.type} · {formatFileSize(attachment.file.size)}
-        </p>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-xs font-medium">{attachment.file.name}</p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-[10px] capitalize text-muted-foreground">
+              {attachment.type} · {formatFileSize(attachment.file.size)}
+            </span>
+            <span>·</span>
+            <label
+              htmlFor={`replace-${attachment.id}`}
+              className="text-[10px] text-primary font-bold hover:underline cursor-pointer"
+            >
+              Ganti
+            </label>
+            <input
+              id={`replace-${attachment.id}`}
+              type="file"
+              accept={
+                attachment.type === "image"
+                  ? "image/*"
+                  : attachment.type === "video"
+                  ? "video/*"
+                  : "*/*"
+              }
+              className="sr-only"
+              onChange={(e) => {
+                const files = e.target.files;
+                if (files?.length && onReplace) {
+                  onReplace(attachment.id, files[0]);
+                }
+              }}
+            />
+          </div>
+        </div>
       </div>
+
+      <input
+        type="text"
+        value={attachment.caption || ""}
+        onChange={(e) => onCaptionChange?.(attachment.id, e.target.value)}
+        placeholder="Tulis keterangan / caption untuk lampiran ini..."
+        className="flex h-8 w-full rounded border border-neutral-200 bg-neutral-50/50 px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white transition-all"
+      />
     </div>
   );
 }
@@ -221,6 +277,7 @@ export async function pendingToCommentAttachment(
     url: dataUrl,
     size: att.file.size,
     mimeType: att.file.type || "application/octet-stream",
+    caption: att.caption || null,
   };
 }
 

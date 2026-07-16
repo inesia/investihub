@@ -36,6 +36,27 @@ export interface CaseWithRelations {
   city?: string | null;
   scheduleInvestigator?: string | null;
   documents?: CommentAttachment[] | null;
+  
+  // Custom Claim Form Fields
+  claimType?: string | null;
+  policyHolder?: string | null;
+  applicationDate?: string | null;
+  activeDate?: string | null;
+  basicCoverage?: string | null;
+  wop?: string | null;
+  flexiCi?: string | null;
+  addb?: string | null;
+  premium?: string | null;
+  policyAge?: string | null;
+  beneficiary?: string | null;
+  treatmentDate?: string | null;
+  treatmentPlace?: string | null;
+  diagnosis?: string | null;
+  agentName?: string | null;
+  addressKtp?: string | null;
+  addressSpaj?: string | null;
+  investigationTargets?: string[] | null;
+  documentChecklist?: string[] | null;
 }
 
 export interface ActivityLogWithAuthor {
@@ -57,6 +78,7 @@ export interface CommentAttachment {
   url: string;
   size: number;
   mimeType: string;
+  caption?: string | null;
 }
 
 export interface CommentWithAuthor {

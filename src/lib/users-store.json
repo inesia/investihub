@@ -1,0 +1,113 @@
+[
+  {
+    "id": "user-inv-001",
+    "name": "Sigit Sartono",
+    "email": "investigator@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-002",
+    "name": "Rudy Aru Rachman",
+    "email": "rudy@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-003",
+    "name": "Triyani Firdaus",
+    "email": "triyani@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-004",
+    "name": "Wahyu Noviansyah",
+    "email": "wahyu@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-005",
+    "name": "Akbar Ramadhan",
+    "email": "akbar@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-006",
+    "name": "Encep Supriadi",
+    "email": "encep@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-007",
+    "name": "Prana Ramadhan",
+    "email": "prana@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-008",
+    "name": "Anwim Yanma Aji",
+    "email": "anwim@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-009",
+    "name": "Heru Adelisbowo",
+    "email": "heru@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-010",
+    "name": "Rd. Teja Bagjasumirat Natakusumah",
+    "email": "teja@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-011",
+    "name": "Rizky Adhyatma",
+    "email": "rizky@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-inv-012",
+    "name": "Rahmad Fadhil",
+    "email": "rahmad@investihub.com",
+    "password": "password123",
+    "role": "INVESTIGATOR"
+  },
+  {
+    "id": "user-client-allianz",
+    "name": "Siti Rahayu",
+    "email": "client@allianz.co.id",
+    "password": "password123",
+    "role": "CLIENT",
+    "companyName": "PT Allianz Indonesia",
+    "clientId": "client-002",
+    "tenantSlug": "allianz"
+  },
+  {
+    "id": "user-client-prudential",
+    "name": "Andi Wijaya",
+    "email": "client@prudential.co.id",
+    "password": "password123",
+    "role": "CLIENT",
+    "companyName": "PT Prudential Life Assurance",
+    "clientId": "client-003",
+    "tenantSlug": "prudential"
+  },
+  {
+    "id": "user-admin-001",
+    "name": "Admin User",
+    "email": "admin@investihub.com",
+    "password": "password123",
+    "role": "ADMIN"
+  }
+]

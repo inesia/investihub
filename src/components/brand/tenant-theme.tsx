@@ -25,6 +25,8 @@ export function TenantThemeProvider({
       slug = "allianz";
     } else if (pathname?.startsWith("/login/prudential")) {
       slug = "prudential";
+    } else if (user?.role === "INVESTIGATOR") {
+      slug = "investigator";
     } else {
       slug = resolveTenantSlug({
         clientId: user?.clientId,

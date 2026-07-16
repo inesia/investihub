@@ -29,37 +29,9 @@ export interface SearchResultItem {
   status?: CaseStatus;
 }
 
-export interface MockClient {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  activeCases: number;
-}
+import { getClients, type MockClient } from "./client-store";
 
-export const mockClients: MockClient[] = [
-  {
-    id: "client-001",
-    name: "PT Asuransi Sejahtera",
-    email: "contact@asuransisejahtera.co.id",
-    phone: "+62 21 1234 5678",
-    activeCases: 12,
-  },
-  {
-    id: "client-002",
-    name: "PT Allianz Indonesia",
-    email: "info@allianz.co.id",
-    phone: "+62 21 8765 4321",
-    activeCases: 8,
-  },
-  {
-    id: "client-003",
-    name: "PT Prudential Life Assurance",
-    email: "info@prudential.co.id",
-    phone: "+62 21 2995 8888",
-    activeCases: 5,
-  },
-];
+export const mockClients = getClients();
 
 function normalize(value: string): string {
   return value.toLowerCase().trim();

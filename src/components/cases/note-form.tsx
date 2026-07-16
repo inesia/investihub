@@ -12,7 +12,7 @@ import {
   type PendingAttachment,
 } from "@/components/cases/attachment-picker";
 import { Button } from "@/components/ui/button";
-import { htmlToPlainText, sanitizeHtml, validateFile } from "@/lib/note-utils";
+import { htmlToPlainText, sanitizeHtml, validateFile, getAttachmentType } from "@/lib/note-utils";
 
 export interface NoteFormData {
   content: string;
@@ -82,6 +82,34 @@ export function NoteForm({
     setUploadError(null);
   }, []);
 
+  const handleCaptionChange = (id: string, caption: string) => {
+    setAttachments((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, caption } : a))
+    );
+  };
+
+  const handleReplaceFile = (id: string, file: File) => {
+    const error = validateFile(file);
+    if (error) {
+      setUploadError(error);
+      return;
+    }
+    setAttachments((prev) =>
+      prev.map((a) => {
+        if (a.id === id) {
+          URL.revokeObjectURL(a.previewUrl);
+          return {
+            ...a,
+            file,
+            previewUrl: URL.createObjectURL(file),
+            type: getAttachmentType(file.type, file.name),
+          };
+        }
+        return a;
+      })
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit || isSubmitting) return;
@@ -126,6 +154,8 @@ export function NoteForm({
         attachments={attachments}
         onAdd={handleAddFiles}
         onRemove={handleRemove}
+        onCaptionChange={handleCaptionChange}
+        onReplace={handleReplaceFile}
         error={uploadError}
       />
 

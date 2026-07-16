@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,6 +12,7 @@ import {
   ChevronLeft,
   UserCircle,
   PlusCircle,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -55,6 +57,12 @@ export function Sidebar({
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const brand = useTenantBrand();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await logout();
+  };
 
   const filteredNav = navItems.filter(
     (item) => !item.roles || item.roles.includes(user?.role ?? "")
@@ -123,14 +131,20 @@ export function Sidebar({
         <div className="border-t border-white/10 p-3">
           <button
             type="button"
-            onClick={() => logout()}
+            onClick={handleLogout}
+            disabled={isLoggingOut}
             className={cn(
               "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white",
-              isCollapsed && "justify-center px-2"
+              isCollapsed && "justify-center px-2",
+              isLoggingOut && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-white/70"
             )}
           >
-            <LogOut className="h-4 w-4 shrink-0" />
-            {!isCollapsed && <span>Keluar</span>}
+            {isLoggingOut ? (
+              <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+            ) : (
+              <LogOut className="h-4 w-4 shrink-0" />
+            )}
+            {!isCollapsed && <span>{isLoggingOut ? "Keluar..." : "Keluar"}</span>}
           </button>
         </div>
 

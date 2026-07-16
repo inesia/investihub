@@ -32,7 +32,7 @@ export function AppShell({ children, title = "Dashboard" }: AppShellProps) {
   useSearchShortcut(() => setSearchOpen(true));
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-background">
+    <div className="fixed inset-0 flex overflow-hidden bg-background">
       <Sidebar
         isOpen={sidebarOpen}
         isCollapsed={sidebarCollapsed}

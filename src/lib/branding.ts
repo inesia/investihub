@@ -1,4 +1,4 @@
-export type TenantSlug = "default" | "allianz" | "prudential";
+export type TenantSlug = "default" | "allianz" | "prudential" | "investigator";
 
 export interface TenantBrand {
   slug: TenantSlug;
@@ -41,6 +41,14 @@ export const TENANT_BRANDS: Record<TenantSlug, TenantBrand> = {
     tagline: "Claim Investigation Portal",
     logoSrc: "/brands/prudential/Prudential_plc_logo.svg.webp",
     clientId: "client-003",
+  },
+  investigator: {
+    slug: "investigator",
+    name: "InvestiHub Investigator",
+    shortName: "Investigator",
+    tagline: "Field Investigation Portal",
+    logoSrc: "/global_investigasi.png",
+    clientId: null,
   },
 };
 

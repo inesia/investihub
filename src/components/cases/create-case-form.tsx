@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FileText, Loader2, User } from "lucide-react";
+import { FileText, Loader2, User, Building2 } from "lucide-react";
 import type { CaseStatus } from "@/types";
 import { CASE_STATUS_COLUMNS } from "@/types";
 import { useAuth } from "@/contexts/auth-context";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { mockInvestigators } from "@/lib/case-store";
-import { mockClients } from "@/lib/search";
+import { getClients, type MockClient } from "@/lib/client-store";
 import { createCaseSchema, type CreateCaseInput } from "@/lib/validations/case";
 import {
   AttachmentPicker,
@@ -30,11 +30,16 @@ export function CreateCaseForm() {
   const { addCase } = useCases();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [clients, setClients] = useState<MockClient[]>([]);
+
+  useEffect(() => {
+    setClients(getClients());
+  }, []);
 
   const defaultClientId =
     user?.role === "CLIENT"
       ? (user.clientId ?? "client-001")
-      : mockClients[0]?.id ?? "";
+      : clients[0]?.id ?? "";
 
   const [form, setForm] = useState<CreateCaseInput>({
     policyNumber: "",
@@ -46,6 +51,40 @@ export function CreateCaseForm() {
     city: "",
     scheduleInvestigator: "",
     documents: [],
+    
+    // Custom Claim Form Fields
+    claimType: "Critical Illness",
+    policyHolder: "",
+    applicationDate: "",
+    activeDate: "",
+    basicCoverage: "",
+    wop: "",
+    flexiCi: "",
+    addb: "",
+    premium: "",
+    policyAge: "",
+    beneficiary: "",
+    treatmentDate: "",
+    treatmentPlace: "",
+    diagnosis: "",
+    agentName: "",
+    addressKtp: "",
+    addressSpaj: "",
+    investigationTargets: [
+      "Memastikan kebenaran data Identitas Tertanggung dan data Polis",
+      "Memastikan kebenaran Pengajuan data klaim Critical Illness",
+      "Melakukan penelusuran riwayat medis Tertanggung sebelumnya"
+    ],
+    documentChecklist: [
+      "SPAJ",
+      "Formulir pengajuan Klaim Penyakit Kritis",
+      "Surat Keterangan asli dari dokter Spesialis",
+      "KTP Tertanggung",
+      "Foto Copy Surat Kuasa Pelepasan Medis",
+      "Surat kuasa pendebatan",
+      "Pernyataan Agent",
+      "Hasil Laboratorium"
+    ],
   });
 
   // Attachments Handling
@@ -106,6 +145,14 @@ export function CreateCaseForm() {
     });
   };
 
+  const toggleChecklist = (field: "investigationTargets" | "documentChecklist", item: string) => {
+    const current = (form[field] as string[]) || [];
+    const next = current.includes(item)
+      ? current.filter((x) => x !== item)
+      : [...current, item];
+    updateField(field, next);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -126,6 +173,27 @@ export function CreateCaseForm() {
         city: form.city || undefined,
         scheduleInvestigator: form.scheduleInvestigator || undefined,
         documents: persistedAttachments,
+        
+        // Custom Claim Form Fields
+        claimType: form.claimType || undefined,
+        policyHolder: form.policyHolder || undefined,
+        applicationDate: form.applicationDate || undefined,
+        activeDate: form.activeDate || undefined,
+        basicCoverage: form.basicCoverage || undefined,
+        wop: form.wop || undefined,
+        flexiCi: form.flexiCi || undefined,
+        addb: form.addb || undefined,
+        premium: form.premium || undefined,
+        policyAge: form.policyAge || undefined,
+        beneficiary: form.beneficiary || undefined,
+        treatmentDate: form.treatmentDate || undefined,
+        treatmentPlace: form.treatmentPlace || undefined,
+        diagnosis: form.diagnosis || undefined,
+        agentName: form.agentName || undefined,
+        addressKtp: form.addressKtp || undefined,
+        addressSpaj: form.addressSpaj || undefined,
+        investigationTargets: form.investigationTargets || [],
+        documentChecklist: form.documentChecklist || [],
       };
 
       const result = createCaseSchema.safeParse(payload);
@@ -212,7 +280,7 @@ export function CreateCaseForm() {
                 onChange={(e) => updateField("clientId", e.target.value)}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                {mockClients.map((client) => (
+                {clients.map((client) => (
                   <option key={client.id} value={client.id}>
                     {client.name}
                   </option>
@@ -283,22 +351,294 @@ export function CreateCaseForm() {
           </FormField>
 
           <FormField
-            label="Deskripsi"
+            label="Deskripsi Umum Kasus"
             error={errors.description}
             className="sm:col-span-2"
           >
             <textarea
               value={form.description ?? ""}
               onChange={(e) => updateField("description", e.target.value)}
-              placeholder="Deskripsikan klaim (detail kejadian, jenis kerusakan, dll.)"
-              rows={4}
+              placeholder="Deskripsikan klaim secara garis besar..."
+              rows={3}
+              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </FormField>
+        </div>
+      </div>
+
+      {/* SECTION I: Latar Belakang Data Polis */}
+      <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center gap-3 border-b border-neutral-100 pb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-primary">
+            <Building2 className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold">I. Latar Belakang Data Polis</h2>
+            <p className="text-sm text-muted-foreground">Detail kontrak dan pemegang polis asuransi</p>
+          </div>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <FormField label="Jenis Klaim">
+            <Input
+              value={form.claimType ?? ""}
+              onChange={(e) => updateField("claimType", e.target.value)}
+              placeholder="e.g. Critical Illness"
+            />
+          </FormField>
+
+          <FormField label="Pemegang Polis">
+            <Input
+              value={form.policyHolder ?? ""}
+              onChange={(e) => updateField("policyHolder", e.target.value)}
+              placeholder="e.g. Kiki Meivira"
+            />
+          </FormField>
+
+          <FormField label="Tanggal Aplikasi Polis">
+            <Input
+              type="text"
+              value={form.applicationDate ?? ""}
+              onChange={(e) => updateField("applicationDate", e.target.value)}
+              placeholder="e.g. 13 -July 2024"
+            />
+          </FormField>
+
+          <FormField label="Tanggal Aktif Polis">
+            <Input
+              type="text"
+              value={form.activeDate ?? ""}
+              onChange={(e) => updateField("activeDate", e.target.value)}
+              placeholder="e.g. 15 -July 2024"
+            />
+          </FormField>
+
+          <FormField label="Beneficiary (Penerima Manfaat)">
+            <Input
+              value={form.beneficiary ?? ""}
+              onChange={(e) => updateField("beneficiary", e.target.value)}
+              placeholder="e.g. RAY TOMMY - Adik"
+            />
+          </FormField>
+
+          <FormField label="Usia Polis">
+            <Input
+              value={form.policyAge ?? ""}
+              onChange={(e) => updateField("policyAge", e.target.value)}
+              placeholder="e.g. ± 7 Bulan 1 hari"
+            />
+          </FormField>
+
+          <FormField label="Nama Agen">
+            <Input
+              value={form.agentName ?? ""}
+              onChange={(e) => updateField("agentName", e.target.value)}
+              placeholder="e.g. DESTY"
+            />
+          </FormField>
+        </div>
+      </div>
+
+      {/* SECTION II: Rincian Pertanggungan */}
+      <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center gap-3 border-b border-neutral-100 pb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-primary">
+            <Building2 className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold">II. Nilai Pertanggungan & Premi</h2>
+            <p className="text-sm text-muted-foreground">Detail nilai tanggungan manfaat asuransi</p>
+          </div>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <FormField label="Pertanggungan Dasar (Rp)">
+            <Input
+              value={form.basicCoverage ?? ""}
+              onChange={(e) => updateField("basicCoverage", e.target.value)}
+              placeholder="e.g. Rp 2.000.000.000.-"
+            />
+          </FormField>
+
+          <FormField label="WOP Benefit">
+            <Input
+              value={form.wop ?? ""}
+              onChange={(e) => updateField("wop", e.target.value)}
+              placeholder="e.g. Rp 34.300.000.-"
+            />
+          </FormField>
+
+          <FormField label="Flexi CI">
+            <Input
+              value={form.flexiCi ?? ""}
+              onChange={(e) => updateField("flexiCi", e.target.value)}
+              placeholder="Nominal Flexi CI benefit"
+            />
+          </FormField>
+
+          <FormField label="ADDB Benefit">
+            <Input
+              value={form.addb ?? ""}
+              onChange={(e) => updateField("addb", e.target.value)}
+              placeholder="Nominal ADDB benefit"
+            />
+          </FormField>
+
+          <FormField label="Premi Bulanan/Tahunan (Rp)">
+            <Input
+              value={form.premium ?? ""}
+              onChange={(e) => updateField("premium", e.target.value)}
+              placeholder="e.g. Rp 34.300.000.-"
+            />
+          </FormField>
+        </div>
+      </div>
+
+      {/* SECTION III: Data Medis & Perawatan */}
+      <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center gap-3 border-b border-neutral-100 pb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-primary">
+            <Building2 className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold">III. Riwayat Medis & Perawatan</h2>
+            <p className="text-sm text-muted-foreground">Detail tempat berobat dan diagnosa awal</p>
+          </div>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <FormField label="Tanggal Perawatan">
+            <Input
+              value={form.treatmentDate ?? ""}
+              onChange={(e) => updateField("treatmentDate", e.target.value)}
+              placeholder="e.g. 09 -02 - 2026"
+            />
+          </FormField>
+
+          <FormField label="Tempat & Dokter Perawatan">
+            <Input
+              value={form.treatmentPlace ?? ""}
+              onChange={(e) => updateField("treatmentPlace", e.target.value)}
+              placeholder="e.g. Hospital Picasso - Dr Yi Cheng Har"
+            />
+          </FormField>
+
+          <FormField label="Diagnosa Penyakit" className="sm:col-span-2">
+            <textarea
+              value={form.diagnosis ?? ""}
+              onChange={(e) => updateField("diagnosis", e.target.value)}
+              placeholder="e.g. Benjolan payudara 1week, Kanker Payudara kiri stg I"
+              rows={3}
+              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </FormField>
+        </div>
+      </div>
+
+      {/* SECTION IV: Alamat Tempat Tinggal */}
+      <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center gap-3 border-b border-neutral-100 pb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-primary">
+            <Building2 className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold">IV. Informasi Alamat Tertanggung</h2>
+            <p className="text-sm text-muted-foreground">Alamat resmi berdasarkan dokumen identitas & berkas pengajuan</p>
+          </div>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <FormField label="Alamat KTP" className="sm:col-span-2">
+            <textarea
+              value={form.addressKtp ?? ""}
+              onChange={(e) => updateField("addressKtp", e.target.value)}
+              placeholder="Masukkan alamat lengkap sesuai KTP..."
+              rows={2}
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </FormField>
 
-          <div className="sm:col-span-2 border-t border-neutral-100 pt-4 mt-2">
+          <FormField label="Alamat SPAJ / Tempat Usaha" className="sm:col-span-2">
+            <textarea
+              value={form.addressSpaj ?? ""}
+              onChange={(e) => updateField("addressSpaj", e.target.value)}
+              placeholder="Masukkan alamat tempat tinggal lain / tempat usaha sesuai SPAJ..."
+              rows={2}
+              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </FormField>
+        </div>
+      </div>
+
+      {/* SECTION V: Target Investigasi & Checklist Dokumen */}
+      <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center gap-3 border-b border-neutral-100 pb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-primary">
+            <Building2 className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold">V. Target Investigasi & Lampiran Berkas</h2>
+            <p className="text-sm text-muted-foreground">Cakupan kerja investigasi lapangan dan berkas pendukung</p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <Label className="mb-3 block text-sm font-semibold text-neutral-800">Checklist Dokumen Pendukung</Label>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {[
+                "SPAJ",
+                "Formulir pengajuan Klaim Penyakit Kritis",
+                "Surat Keterangan asli dari dokter Spesialis",
+                "KTP Tertanggung",
+                "Foto Copy Surat Kuasa Pelepasan Medis",
+                "Surat kuasa pendebatan",
+                "Pernyataan Agent",
+                "Hasil Laboratorium"
+              ].map((doc) => {
+                const checked = (form.documentChecklist as string[])?.includes(doc);
+                return (
+                  <label key={doc} className="flex items-center gap-2 text-sm text-neutral-700 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleChecklist("documentChecklist", doc)}
+                      className="h-4 w-4 rounded border-neutral-300 text-primary focus:ring-primary"
+                    />
+                    <span>{doc}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="border-t border-neutral-100 pt-4">
+            <Label className="mb-3 block text-sm font-semibold text-neutral-800">Target Utama Investigasi</Label>
+            <div className="space-y-2">
+              {[
+                "Memastikan kebenaran data Identitas Tertanggung dan data Polis",
+                "Memastikan kebenaran Pengajuan data klaim Critical Illness",
+                "Melakukan penelusuran riwayat medis Tertanggung sebelumnya"
+              ].map((target) => {
+                const checked = (form.investigationTargets as string[])?.includes(target);
+                return (
+                  <label key={target} className="flex items-start gap-2 text-sm text-neutral-700 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleChecklist("investigationTargets", target)}
+                      className="mt-1 h-4 w-4 shrink-0 rounded border-neutral-300 text-primary focus:ring-primary"
+                    />
+                    <span>{target}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="border-t border-neutral-100 pt-4">
             <Label className="mb-2 block text-sm font-semibold text-neutral-800">
-              Upload Dokumen (Lampiran berkas klaim / foto)
+              Upload File Hasil Foto & Dokumen Digital
             </Label>
             <AttachmentPicker
               attachments={attachments}

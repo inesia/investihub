@@ -9,13 +9,14 @@ import {
 } from "react";
 import type { CaseWithRelations } from "@/types";
 import type { CreateCaseInput } from "@/lib/validations/case";
-import { createCase as createCaseInStore, getAllCases } from "@/lib/case-store";
+import { createCase as createCaseInStore, getAllCases, updateCase as updateCaseInStore } from "@/lib/case-store";
 
 interface CasesContextValue {
   cases: CaseWithRelations[];
   isLoading: boolean;
   addCase: (input: CreateCaseInput) => CaseWithRelations;
   getCaseById: (id: string) => CaseWithRelations | undefined;
+  updateCase: (id: string, updates: Partial<CaseWithRelations>) => CaseWithRelations | undefined;
   refreshCases: () => void;
 }
 
@@ -48,9 +49,20 @@ export function CasesProvider({ children }: { children: React.ReactNode }) {
     [cases]
   );
 
+  const updateCase = useCallback(
+    (id: string, updates: Partial<CaseWithRelations>) => {
+      const updatedCase = updateCaseInStore(id, updates);
+      if (updatedCase) {
+        setCases(getAllCases());
+      }
+      return updatedCase;
+    },
+    []
+  );
+
   return (
     <CasesContext.Provider
-      value={{ cases, isLoading, addCase, getCaseById, refreshCases }}
+      value={{ cases, isLoading, addCase, getCaseById, updateCase, refreshCases }}
     >
       {children}
     </CasesContext.Provider>

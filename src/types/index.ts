@@ -113,6 +113,7 @@ export const STATUS_LABELS: Record<CaseStatus, string> = {
   NEW: "Kasus Baru",
   ON_PROGRESS: "Sedang Diproses",
   CLOSED: "Selesai",
+  ARCHIVED: "Diarsipkan",
 };
 
 /** Theme-aware badges — use primary/accent tokens so Allianz blue theme applies */
@@ -120,6 +121,7 @@ export const STATUS_BADGE_STYLES: Record<CaseStatus, string> = {
   NEW: "bg-blue-50 text-blue-700 border-blue-200",
   ON_PROGRESS: "bg-amber-50 text-amber-700 border-amber-200",
   CLOSED: "bg-neutral-100 text-neutral-600 border-neutral-300",
+  ARCHIVED: "bg-neutral-200 text-neutral-800 border-neutral-300",
 };
 
 export const ROLE_LABELS: Record<Role, string> = {

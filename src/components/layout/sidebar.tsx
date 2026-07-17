@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   UserCircle,
   PlusCircle,
+  Archive,
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,7 @@ const navItems: NavItem[] = [
     roles: ["ADMIN", "INVESTIGATOR"],
   },
   { label: "Klien", href: "/dashboard/clients", icon: Users, roles: ["ADMIN"] },
+  { label: "Arsip", href: "/dashboard/archive", icon: Archive, roles: ["ADMIN", "INVESTIGATOR"] },
   { label: "Profil", href: "/dashboard/profile", icon: UserCircle },
 ];
 

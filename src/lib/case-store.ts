@@ -269,3 +269,20 @@ export function createCase(input: CreateCaseInput): CaseWithRelations {
 export function getCreatedCases(): CaseWithRelations[] {
   return loadStoredCases();
 }
+
+export function updateCase(id: string, updates: Partial<CaseWithRelations>): CaseWithRelations | undefined {
+  const cases = loadStoredCases();
+  const caseIndex = cases.findIndex((c) => c.id === id);
+  if (caseIndex === -1) return undefined;
+  
+  const updatedCase = {
+    ...cases[caseIndex],
+    ...updates,
+    updatedAt: new Date(),
+  };
+  
+  cases[caseIndex] = updatedCase;
+  saveStoredCases(cases);
+  
+  return updatedCase;
+}

@@ -17,6 +17,7 @@ enum CaseStatus {
   NEW
   ON_PROGRESS
   CLOSED
+  ARCHIVED
 }
 
 model User {

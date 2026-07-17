@@ -11,6 +11,7 @@ const STATUS_TOOLTIPS: Record<CaseStatus, string> = {
   NEW: "Kasus baru yang belum diproses oleh Investigator.",
   ON_PROGRESS: "Investigator sedang melakukan investigasi kasus di lapangan.",
   CLOSED: "Kasus telah selesai, laporan akhir sudah diserahkan dan ditutup.",
+  ARCHIVED: "Kasus yang telah diarsipkan.",
 };
 
 interface KanbanColumnProps {
@@ -76,7 +77,7 @@ export function groupCasesByStatus(
 ): Record<CaseStatus, CaseWithRelations[]> {
   const grouped = {} as Record<CaseStatus, CaseWithRelations[]>;
 
-  for (const status of ["NEW", "ON_PROGRESS", "CLOSED"] as CaseStatus[]) {
+  for (const status of ["NEW", "ON_PROGRESS", "CLOSED", "ARCHIVED"] as CaseStatus[]) {
     grouped[status] = cases.filter((c) => c.status === status);
   }
 

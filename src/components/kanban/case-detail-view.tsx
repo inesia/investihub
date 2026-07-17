@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -17,12 +17,13 @@ import {
   Search,
   Filter,
 } from "lucide-react";
-import type { CaseWithRelations, CommentWithAuthor } from "@/types";
+import type { CaseWithRelations, CommentWithAuthor, CommentAttachment } from "@/types";
 import { STATUS_LABELS, canPostComments } from "@/types";
 import { StatusBadge } from "@/components/kanban/status-badge";
 import { CommentItem, AttachmentDisplay } from "@/components/cases/comment-item";
 import { NoteForm, type NoteFormData } from "@/components/cases/note-form";
 import { useAuth } from "@/contexts/auth-context";
+import { useCases } from "@/contexts/cases-context";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
@@ -65,7 +66,25 @@ const initialComments: CommentWithAuthor[] = [];
 
 export function CaseDetailView({ caseData }: CaseDetailViewProps) {
   const { user } = useAuth();
-  const [comments, setComments] = useState<CommentWithAuthor[]>(initialComments);
+  const { updateCase } = useCases();
+  const STORAGE_KEY = `investihub-comments-${caseData.id}`;
+  const [comments, setComments] = useState<CommentWithAuthor[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.error("Failed to load comments from local storage", e);
+      }
+    }
+    return initialComments;
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(comments));
+    }
+  }, [comments, STORAGE_KEY]);
   const [showDetails, setShowDetails] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -88,14 +107,25 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
     };
 
     setComments((prev) => [...prev, comment]);
+
+    // Automatically trigger status to ON_PROGRESS when the first field note is posted
+    if (caseData.status === "NEW") {
+      updateCase(caseData.id, { status: "ON_PROGRESS" });
+    }
   };
 
   const router = useRouter();
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
 
   const handleCompleteCase = () => {
-    alert("Status kasus telah diperbarui menjadi 'Selesai'.");
+    updateCase(caseData.id, { status: "CLOSED" });
     router.push("/dashboard");
+  };
+
+  const handleArchiveCase = () => {
+    updateCase(caseData.id, { status: "ARCHIVED" });
+    alert("Kasus telah diarsipkan.");
+    router.push("/dashboard/archive");
   };
 
   const handleSaveCancelledCase = () => {
@@ -514,24 +544,56 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
               onClick={() => setShowActions(!showActions)}
               className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
-              <span>{showActions ? "Tutup pengaturan" : "Apakah kasus ini sudah selesai?"}</span>
+              <span>{showActions ? "Tutup pengaturan" : "Atur Status Kasus"}</span>
               <ChevronDown className={cn("h-4 w-4 transition-transform", showActions && "rotate-180")} />
             </button>
             
             {showActions && (
-              <div className="mt-5 flex w-full max-w-sm flex-col sm:flex-row gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                <button 
-                  onClick={handleCompleteCase}
-                  className="flex-1 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-colors"
-                >
-                  Tandai Selesai
-                </button>
-                <button 
-                  onClick={() => setCancelModalOpen(true)}
-                  className="flex-1 rounded-md bg-destructive px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-destructive/90 transition-colors"
-                >
-                  Batalkan Kasus
-                </button>
+              <div className="mt-5 flex w-full max-w-sm flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                {user?.role === "ADMIN" && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                    <label className="mb-1.5 block text-xs font-semibold text-red-700">Admin Override Status</label>
+                    <select
+                      value={caseData.status}
+                      onChange={(e) => {
+                        updateCase(caseData.id, { status: e.target.value as any });
+                        alert("Status berhasil diubah secara manual.");
+                        router.push("/dashboard");
+                      }}
+                      className="w-full rounded-md border border-red-200 bg-white px-3 py-1.5 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                    >
+                      {Object.entries(STATUS_LABELS).map(([key, label]) => (
+                        <option key={key} value={key}>{label}</option>
+                      ))}
+                    </select>
+                    <p className="mt-1.5 text-[10px] text-red-600 leading-tight">Gunakan fitur ini hanya untuk mengembalikan status akibat Human Error.</p>
+                  </div>
+                )}
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {caseData.status !== "CLOSED" && caseData.status !== "ARCHIVED" && (
+                    <button 
+                      onClick={handleCompleteCase}
+                      className="flex-1 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-colors"
+                    >
+                      Tandai Selesai
+                    </button>
+                  )}
+                  {caseData.status === "CLOSED" && (
+                    <button 
+                      onClick={handleArchiveCase}
+                      className="flex-1 rounded-md bg-neutral-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-neutral-700 transition-colors"
+                    >
+                      Arsipkan Kasus
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => setCancelModalOpen(true)}
+                    className="flex-1 rounded-md bg-destructive px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-destructive/90 transition-colors"
+                  >
+                    Batalkan Kasus
+                  </button>
+                </div>
               </div>
             )}
           </div>

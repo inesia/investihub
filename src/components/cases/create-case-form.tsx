@@ -42,6 +42,8 @@ export function CreateCaseForm() {
       ? (user.clientId ?? "client-001")
       : clients[0]?.id ?? "";
 
+  const DRAFT_KEY = "investihub-create-case-draft";
+
   const [form, setForm] = useState<CreateCaseInput>({
     policyNumber: "",
     insuredName: "",
@@ -87,6 +89,24 @@ export function CreateCaseForm() {
       "Hasil Laboratorium"
     ],
   });
+
+  // Load draft on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setForm((prev) => ({ ...prev, ...parsed }));
+      }
+    } catch (e) {
+      console.error("Failed to parse draft", e);
+    }
+  }, []);
+
+  // Save draft on change
+  useEffect(() => {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(form));
+  }, [form]);
 
   // Attachments Handling
   const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
@@ -211,6 +231,7 @@ export function CreateCaseForm() {
 
       const newCase = addCase(result.data);
       attachments.forEach(revokePendingAttachment);
+      localStorage.removeItem(DRAFT_KEY);
       router.push(`/dashboard/cases/${newCase.id}`);
     } catch {
       setErrors({ form: "Failed to create case. Please try again." });

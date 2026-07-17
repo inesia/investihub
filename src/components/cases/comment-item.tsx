@@ -1,21 +1,25 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Download, FileText, MoreVertical, Edit2, Trash2, X, Check, Plus, Image as ImageIcon, Video, Paperclip } from "lucide-react";
+import { Download, FileText, MoreVertical, Edit2, Trash2, X, Check, Plus, Image as ImageIcon, Video, Paperclip, MessageCircle } from "lucide-react";
 import type { CommentWithAuthor, CommentAttachment } from "@/types";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDateTime, getInitials } from "@/lib/utils";
 import { formatFileSize, sanitizeHtml } from "@/lib/note-utils";
 import { PreviewModal } from "@/components/ui/preview-modal";
+import { NoteForm } from "@/components/cases/note-form";
 
 interface CommentItemProps {
   comment: CommentWithAuthor;
   index?: number;
-  onEdit?: (content: string, contentHtml?: string, attachments?: CommentAttachment[]) => void;
-  onDelete?: () => void;
+  onEdit?: (id: string, content: string, contentHtml?: string, attachments?: CommentAttachment[]) => void;
+  onDelete?: (id: string) => void;
+  onReply?: (parentId: string, content: string, contentHtml?: string, attachments?: CommentAttachment[]) => void;
   canManage?: boolean;
+  replies?: CommentWithAuthor[];
+  isReply?: boolean;
 }
 
-export function CommentItem({ comment, index = 0, onEdit, onDelete, canManage = false }: CommentItemProps) {
+export function CommentItem({ comment, index = 0, onEdit, onDelete, onReply, canManage = false, replies = [], isReply = false }: CommentItemProps) {
   const hasHtml = Boolean(comment.contentHtml?.trim());
   const hasAttachments = Boolean(comment.attachments?.length);
   
@@ -23,6 +27,8 @@ export function CommentItem({ comment, index = 0, onEdit, onDelete, canManage = 
   const [editContent, setEditContent] = useState(comment.content);
   const [editAttachments, setEditAttachments] = useState<CommentAttachment[]>(comment.attachments || []);
   const [showMenu, setShowMenu] = useState(false);
+  const [isReplying, setIsReplying] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,12 +47,12 @@ export function CommentItem({ comment, index = 0, onEdit, onDelete, canManage = 
   }, [comment]);
 
   const handleSave = () => {
-    if (!editContent.trim()) return;
+    if (!editContent.trim() && editAttachments.length === 0) return;
     if (onEdit) {
       // Simulate simple HTML generation for edit
       const cleanText = editContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      const cleanHtml = `<p>${cleanText.replace(/\n/g, "<br />")}</p>`;
-      onEdit(editContent, cleanHtml, editAttachments);
+      const cleanHtml = editContent.trim() ? `<p>${cleanText.replace(/\n/g, "<br />")}</p>` : "";
+      onEdit(comment.id, editContent, cleanHtml, editAttachments);
     }
     setIsEditing(false);
   };
@@ -169,7 +175,7 @@ export function CommentItem({ comment, index = 0, onEdit, onDelete, canManage = 
                 </button>
                 <button
                   onClick={() => {
-                    if (onDelete) onDelete();
+                    if (onDelete) onDelete(comment.id);
                     setShowMenu(false);
                   }}
                   className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-destructive hover:bg-red-50 transition-colors border-t border-neutral-100"
@@ -324,7 +330,65 @@ export function CommentItem({ comment, index = 0, onEdit, onDelete, canManage = 
               ))}
             </div>
           )}
+
+          {/* Action bar */}
+          {!isEditing && !isReply && (
+            <div className="mt-3 flex items-center gap-4 border-t border-neutral-100 pt-3">
+              <button
+                onClick={() => setIsReplying(!isReplying)}
+                className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
+              >
+                <MessageCircle className="h-3.5 w-3.5" />
+                Balas
+              </button>
+            </div>
+          )}
         </>
+      )}
+
+      {isReplying && (
+        <div className="mt-4 border-l-2 border-primary/20 pl-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          <NoteForm
+            onSubmit={(data) => {
+              if (onReply) {
+                onReply(comment.id, data.content, data.contentHtml, data.attachments);
+              }
+              setIsReplying(false);
+              setShowReplies(true);
+            }}
+            placeholder="Tulis balasan..."
+            submitLabel="Kirim Balasan"
+          />
+        </div>
+      )}
+
+      {replies.length > 0 && (
+        <div className="mt-4">
+          <button
+            onClick={() => setShowReplies(!showReplies)}
+            className="flex items-center gap-2 text-xs font-semibold text-primary hover:underline transition-all"
+          >
+            <div className="h-px w-8 bg-neutral-200" />
+            {showReplies ? "Sembunyikan balasan" : `Lihat ${replies.length} balasan`}
+          </button>
+          
+          {showReplies && (
+            <div className="mt-4 space-y-3 pl-4 sm:pl-8 animate-in fade-in duration-200 border-l-2 border-neutral-100">
+              {replies.map((reply, i) => (
+                <CommentItem
+                  key={reply.id}
+                  comment={reply}
+                  index={i}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onReply={onReply}
+                  canManage={canManage}
+                  isReply={true}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </motion.div>
   );

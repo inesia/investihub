@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FileText, Loader2, User, Building2 } from "lucide-react";
+import { FileText, Loader2, User, Building2, Info } from "lucide-react";
 import type { CaseStatus } from "@/types";
 import { CASE_STATUS_COLUMNS } from "@/types";
 import { useAuth } from "@/contexts/auth-context";
@@ -11,6 +11,7 @@ import { useCases } from "@/contexts/cases-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { mockInvestigators } from "@/lib/case-store";
 import { getClients, type MockClient } from "@/lib/client-store";
 import { createCaseSchema, type CreateCaseInput } from "@/lib/validations/case";
@@ -452,7 +453,7 @@ export function CreateCaseForm() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <FormField label="Pertanggungan Dasar (Rp)">
+          <FormField label="Pertanggungan Dasar (Rp)" tooltip="Jumlah uang pertanggungan utama sesuai polis">
             <Input
               value={form.basicCoverage ?? ""}
               onChange={(e) => updateField("basicCoverage", e.target.value)}
@@ -460,7 +461,7 @@ export function CreateCaseForm() {
             />
           </FormField>
 
-          <FormField label="WOP Benefit">
+          <FormField label="WOP Benefit" tooltip="Waiver of Premium: Pembebasan premi jika tertanggung mengalami risiko tertentu">
             <Input
               value={form.wop ?? ""}
               onChange={(e) => updateField("wop", e.target.value)}
@@ -468,7 +469,7 @@ export function CreateCaseForm() {
             />
           </FormField>
 
-          <FormField label="Flexi CI">
+          <FormField label="Flexi CI" tooltip="Flexi Critical Illness: Manfaat tambahan perlindungan penyakit kritis">
             <Input
               value={form.flexiCi ?? ""}
               onChange={(e) => updateField("flexiCi", e.target.value)}
@@ -476,7 +477,7 @@ export function CreateCaseForm() {
             />
           </FormField>
 
-          <FormField label="ADDB Benefit">
+          <FormField label="ADDB Benefit" tooltip="Accidental Death & Dismemberment Benefit: Santunan meninggal atau cacat akibat kecelakaan">
             <Input
               value={form.addb ?? ""}
               onChange={(e) => updateField("addb", e.target.value)}
@@ -683,20 +684,36 @@ function FormField({
   required,
   error,
   className,
+  tooltip,
   children,
 }: {
   label: string;
   required?: boolean;
   error?: string;
   className?: string;
+  tooltip?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className={className}>
-      <Label className="mb-1.5 block text-sm font-medium">
-        {label}
-        {required && <span className="ml-0.5 text-primary">*</span>}
-      </Label>
+      <div className="mb-1.5 flex items-center gap-1.5">
+        <Label className="block text-sm font-medium">
+          {label}
+          {required && <span className="ml-0.5 text-primary">*</span>}
+        </Label>
+        {tooltip && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-3.5 w-3.5 text-muted-foreground hover:text-primary transition-colors cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-[250px] text-center text-xs">{tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
       {children}
       {error && <p className="mt-1 text-xs text-primary">{error}</p>}
     </div>

@@ -84,6 +84,7 @@ export interface CommentAttachment {
 export interface CommentWithAuthor {
   id: string;
   caseId: string;
+  parentId?: string;
   content: string;
   contentHtml?: string;
   attachments?: CommentAttachment[];
@@ -103,15 +104,15 @@ export interface KanbanColumn {
 }
 
 export const CASE_STATUS_COLUMNS: KanbanColumn[] = [
-  { id: "NEW", title: "New Case", color: "bg-blue-400" },
-  { id: "ON_PROGRESS", title: "On Progress", color: "bg-amber-400" },
-  { id: "CLOSED", title: "Closed", color: "bg-neutral-400" },
+  { id: "NEW", title: "Kasus Baru", color: "bg-blue-400" },
+  { id: "ON_PROGRESS", title: "Sedang Diproses", color: "bg-amber-400" },
+  { id: "CLOSED", title: "Selesai", color: "bg-neutral-400" },
 ];
 
 export const STATUS_LABELS: Record<CaseStatus, string> = {
-  NEW: "New Case",
-  ON_PROGRESS: "On Progress",
-  CLOSED: "Closed",
+  NEW: "Kasus Baru",
+  ON_PROGRESS: "Sedang Diproses",
+  CLOSED: "Selesai",
 };
 
 /** Theme-aware badges — use primary/accent tokens so Allianz blue theme applies */

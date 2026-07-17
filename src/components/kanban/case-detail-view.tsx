@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Building2,
@@ -13,6 +14,8 @@ import {
   CalendarDays,
   Paperclip,
   ChevronDown,
+  Search,
+  Filter,
 } from "lucide-react";
 import type { CaseWithRelations, CommentWithAuthor } from "@/types";
 import { STATUS_LABELS, canPostComments } from "@/types";
@@ -64,6 +67,9 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<CommentWithAuthor[]>(initialComments);
   const [showDetails, setShowDetails] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   const canComment = canPostComments(user?.role);
 
@@ -82,6 +88,26 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
     };
 
     setComments((prev) => [...prev, comment]);
+  };
+
+  const router = useRouter();
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+
+  const handleCompleteCase = () => {
+    alert("Status kasus telah diperbarui menjadi 'Selesai'.");
+    router.push("/dashboard");
+  };
+
+  const handleSaveCancelledCase = () => {
+    setCancelModalOpen(false);
+    alert("Kasus telah disimpan dengan status 'Dibatalkan'.");
+    router.push("/dashboard");
+  };
+
+  const handleDeleteCase = () => {
+    setCancelModalOpen(false);
+    alert("Kasus berhasil dihapus secara permanen.");
+    router.push("/dashboard");
   };
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -105,6 +131,44 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
       setComments((prev) => prev.filter((c) => c.id !== commentToDelete));
       setCommentToDelete(null);
     }
+  };
+
+  const filteredComments = comments.filter((c) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    const contentText = (c.content || "").toLowerCase();
+    const authorName = (c.author?.name || "").toLowerCase();
+    return contentText.includes(q) || authorName.includes(q);
+  });
+
+  const topLevelComments = filteredComments.filter(c => !c.parentId);
+
+  const sortedComments = [...topLevelComments].sort((a, b) => {
+    const timeA = new Date(a.createdAt).getTime();
+    const timeB = new Date(b.createdAt).getTime();
+    return sortOrder === "newest" ? timeB - timeA : timeA - timeB;
+  });
+
+  const getReplies = (parentId: string) => {
+    return filteredComments
+      .filter((c) => c.parentId === parentId)
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  };
+
+  const handleReplyComment = (parentId: string, content: string, contentHtml?: string, attachments?: CommentAttachment[]) => {
+    if (!user) return;
+    const comment: CommentWithAuthor = {
+      id: `c-${Date.now()}`,
+      caseId: caseData.id,
+      parentId,
+      content,
+      contentHtml,
+      attachments: attachments?.length ? attachments : undefined,
+      createdAt: new Date(),
+      authorId: user.id,
+      author: { id: user.id, name: user.name, role: user.role },
+    };
+    setComments((prev) => [...prev, comment]);
   };
 
   return (
@@ -379,24 +443,59 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
           </div>
         )}
 
+        {comments.length > 0 && (
+          <div className="mb-4 flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Cari laporan..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-md border border-input bg-background pl-9 pr-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary transition-all"
+              />
+            </div>
+            <div className="relative w-full sm:w-40 shrink-0">
+              <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest")}
+                className="w-full appearance-none rounded-md border border-input bg-background pl-8 pr-8 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary transition-all cursor-pointer"
+              >
+                <option value="newest">Terbaru</option>
+                <option value="oldest">Terlama</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            </div>
+          </div>
+        )}
+
         <div className="space-y-4">
-          {comments.length === 0 ? (
+          {sortedComments.length === 0 ? (
             <div className="rounded-xl border border-dashed border-neutral-200 p-8 text-center bg-neutral-50/50">
               <MessageSquare className="mx-auto h-8 w-8 text-neutral-300 mb-2" />
-              <p className="text-sm font-medium text-neutral-600">Belum ada laporan lapangan</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Investigator dapat memposting temuan harian di atas
-              </p>
+              {comments.length === 0 ? (
+                <>
+                  <p className="text-sm font-medium text-neutral-600">Belum ada laporan lapangan</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Investigator dapat memposting temuan harian di atas
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm font-medium text-neutral-600">Laporan tidak ditemukan</p>
+              )}
             </div>
           ) : (
-            comments.map((comment, index) => (
+            sortedComments.map((comment, index) => (
               <CommentItem
                 key={comment.id}
                 comment={comment}
                 index={index}
-                onEdit={(content, html, attachments) => handleEditComment(comment.id, content, html, attachments)}
-                onDelete={() => triggerDeleteComment(comment.id)}
+                onEdit={handleEditComment}
+                onDelete={triggerDeleteComment}
+                onReply={handleReplyComment}
                 canManage={user?.role === "ADMIN" || user?.id === comment.authorId}
+                replies={getReplies(comment.id)}
               />
             ))
           )}
@@ -406,6 +505,36 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
           <p className="mt-5 text-center text-sm text-muted-foreground">
             Masuk sebagai Klien atau Investigator untuk mengunggah laporan
           </p>
+        )}
+
+        {/* Case Actions */}
+        {(user?.role === "ADMIN" || user?.role === "INVESTIGATOR") && (
+          <div className="mt-8 border-t border-neutral-200 pt-8 flex flex-col items-center">
+            <button
+              onClick={() => setShowActions(!showActions)}
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              <span>{showActions ? "Tutup pengaturan" : "Apakah kasus ini sudah selesai?"}</span>
+              <ChevronDown className={cn("h-4 w-4 transition-transform", showActions && "rotate-180")} />
+            </button>
+            
+            {showActions && (
+              <div className="mt-5 flex w-full max-w-sm flex-col sm:flex-row gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                <button 
+                  onClick={handleCompleteCase}
+                  className="flex-1 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-colors"
+                >
+                  Tandai Selesai
+                </button>
+                <button 
+                  onClick={() => setCancelModalOpen(true)}
+                  className="flex-1 rounded-md bg-destructive px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-destructive/90 transition-colors"
+                >
+                  Batalkan Kasus
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </section>
 
@@ -420,6 +549,40 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
         cancelText="Batal"
         isDestructive={true}
       />
+      {/* Cancel Case Custom Modal */}
+      {cancelModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-xl border border-neutral-200 bg-white p-5 shadow-xl animate-in zoom-in-95 duration-200">
+            <div className="mb-4">
+              <h3 className="text-lg font-bold text-foreground">Batalkan Kasus</h3>
+              <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                Apakah Anda ingin menyimpan riwayat kasus ini dengan status dibatalkan, atau menghapusnya secara permanen dari sistem?
+              </p>
+            </div>
+            
+            <div className="mt-6 flex flex-col sm:flex-row justify-end gap-2">
+              <button
+                onClick={() => setCancelModalOpen(false)}
+                className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSaveCancelledCase}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
+              >
+                Simpan
+              </button>
+              <button
+                onClick={handleDeleteCase}
+                className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-white hover:bg-destructive/90 transition-colors"
+              >
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

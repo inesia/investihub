@@ -1,9 +1,17 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { Info } from "lucide-react";
 import type { CaseStatus, CaseWithRelations, KanbanColumn as KanbanColumnType } from "@/types";
 import { CaseCard } from "@/components/kanban/case-card";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+const STATUS_TOOLTIPS: Record<CaseStatus, string> = {
+  NEW: "Kasus baru yang belum diproses oleh Investigator.",
+  ON_PROGRESS: "Investigator sedang melakukan investigasi kasus di lapangan.",
+  CLOSED: "Kasus telah selesai, laporan akhir sudah diserahkan dan ditutup.",
+};
 
 interface KanbanColumnProps {
   column: KanbanColumnType;
@@ -25,6 +33,16 @@ export function KanbanColumn({ column, cases, className }: KanbanColumnProps) {
           <div className="flex items-center gap-2">
             <div className={cn("h-2.5 w-2.5 rounded-full", column.color)} />
             <h3 className="text-sm font-semibold text-foreground">{column.title}</h3>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-3.5 w-3.5 text-muted-foreground hover:text-primary transition-colors cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-[250px] text-center text-xs">{STATUS_TOOLTIPS[column.id]}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-white">
             {cases.length}

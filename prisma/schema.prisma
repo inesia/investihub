@@ -16,6 +16,7 @@ enum Role {
 enum CaseStatus {
   NEW
   ON_PROGRESS
+  PENDING_APPROVAL
   CLOSED
   ARCHIVED
 }

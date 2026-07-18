@@ -45,10 +45,16 @@ export function AdvancedSearch({ open, onOpenChange }: AdvancedSearchProps) {
   const [filters, setFilters] = useState<SearchFilters>(DEFAULT_SEARCH_FILTERS);
   const [showFilters, setShowFilters] = useState(true);
 
-  const baseCases =
-    user?.role === "CLIENT"
-      ? cases.filter((c) => c.clientId === (user.clientId ?? "client-001"))
-      : cases;
+  const baseCases = useMemo(() => {
+    if (user?.role === "CLIENT") {
+      return cases.filter((c) => c.clientId === (user.clientId ?? "client-001"));
+    }
+    if (user?.role === "INVESTIGATOR") {
+      const investigatorId = user.id.replace("user-", "");
+      return cases.filter((c) => c.assigneeId === investigatorId);
+    }
+    return cases;
+  }, [cases, user?.role, user?.clientId, user?.id]);
 
   const results = useMemo(
     () =>

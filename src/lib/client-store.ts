@@ -4,24 +4,19 @@ export interface MockClient {
   email: string;
   phone: string;
   activeCases: number;
+  logo?: string;
 }
 
-const STORAGE_KEY = "investihub-clients-data";
+const STORAGE_KEY = "investihub-clients-data-v3"; // increment version to trigger fresh defaultClients with logos
 
 const defaultClients: MockClient[] = [
-  {
-    id: "client-001",
-    name: "PT Asuransi Sejahtera",
-    email: "contact@asuransisejahtera.co.id",
-    phone: "+62 21 1234 5678",
-    activeCases: 0,
-  },
   {
     id: "client-002",
     name: "PT Allianz Indonesia",
     email: "info@allianz.co.id",
     phone: "+62 21 8765 4321",
     activeCases: 0,
+    logo: "/brands/allianz/logo.svg",
   },
   {
     id: "client-003",
@@ -29,6 +24,7 @@ const defaultClients: MockClient[] = [
     email: "info@prudential.co.id",
     phone: "+62 21 2995 8888",
     activeCases: 0,
+    logo: "/brands/prudential/Prudential_plc_logo.svg.webp",
   },
 ];
 

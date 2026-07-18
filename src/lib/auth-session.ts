@@ -11,6 +11,7 @@ export interface SessionPayload {
   companyName?: string;
   clientId?: string;
   tenantSlug?: string;
+  photo?: string;
 }
 
 export function encodeSession(user: SessionPayload): string {
@@ -38,5 +39,6 @@ export function toAuthUser(session: SessionPayload): AuthUser {
     companyName: session.companyName,
     clientId: session.clientId,
     tenantSlug: session.tenantSlug,
+    photo: session.photo,
   };
 }

@@ -12,6 +12,7 @@ export interface AuthUser {
   clientId?: string;
   /** Tenant branding slug (e.g. "allianz" | "prudential") */
   tenantSlug?: string;
+  photo?: string | null;
 }
 
 export interface CaseWithRelations {
@@ -28,6 +29,7 @@ export interface CaseWithRelations {
     id: string;
     name: string;
     companyName: string | null;
+    logo?: string | null;
   };
   assignee: {
     id: string;
@@ -88,6 +90,9 @@ export interface CommentWithAuthor {
   content: string;
   contentHtml?: string;
   attachments?: CommentAttachment[];
+  isApproved?: boolean;
+  approvedAt?: Date;
+  clientStatus?: "CONFIRMED" | "HOLD" | null;
   createdAt: Date;
   authorId: string;
   author: {
@@ -112,6 +117,7 @@ export const CASE_STATUS_COLUMNS: KanbanColumn[] = [
 export const STATUS_LABELS: Record<CaseStatus, string> = {
   NEW: "Kasus Baru",
   ON_PROGRESS: "Sedang Diproses",
+  PENDING_APPROVAL: "Menunggu Persetujuan",
   CLOSED: "Selesai",
   ARCHIVED: "Diarsipkan",
 };
@@ -120,6 +126,7 @@ export const STATUS_LABELS: Record<CaseStatus, string> = {
 export const STATUS_BADGE_STYLES: Record<CaseStatus, string> = {
   NEW: "bg-blue-50 text-blue-700 border-blue-200",
   ON_PROGRESS: "bg-amber-50 text-amber-700 border-amber-200",
+  PENDING_APPROVAL: "bg-purple-50 text-purple-700 border-purple-200",
   CLOSED: "bg-neutral-100 text-neutral-600 border-neutral-300",
   ARCHIVED: "bg-neutral-200 text-neutral-800 border-neutral-300",
 };
@@ -132,10 +139,10 @@ export const ROLE_LABELS: Record<Role, string> = {
 
 /** Roles that may post notes & comments on a case */
 export function canPostComments(role?: Role | string | null): boolean {
-  return role === "CLIENT" || role === "INVESTIGATOR" || role === "ADMIN";
+  return role === "INVESTIGATOR" || role === "ADMIN";
 }
 
 /** Roles that may create new cases */
 export function canCreateCases(role?: Role | string | null): boolean {
-  return role === "ADMIN" || role === "INVESTIGATOR";
+  return role === "ADMIN";
 }

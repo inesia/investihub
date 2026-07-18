@@ -35,8 +35,12 @@ function DashboardContent() {
       const clientId = user.clientId ?? "client-001";
       return cases.filter((c) => c.clientId === clientId);
     }
+    if (user?.role === "INVESTIGATOR") {
+      const investigatorId = user.id.replace("user-", "");
+      return cases.filter((c) => c.assigneeId === investigatorId);
+    }
     return cases;
-  }, [cases, user?.role, user?.clientId]);
+  }, [cases, user?.role, user?.clientId, user?.id]);
 
   const filteredCases = useMemo(
     () => (hasActiveFilters(filters) ? filterCases(baseCases, filters) : baseCases),

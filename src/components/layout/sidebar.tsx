@@ -14,6 +14,7 @@ import {
   PlusCircle,
   Archive,
   Loader2,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,9 +37,10 @@ const navItems: NavItem[] = [
     label: "Kasus Baru",
     href: "/dashboard/cases/new",
     icon: PlusCircle,
-    roles: ["ADMIN", "INVESTIGATOR"],
+    roles: ["ADMIN"],
   },
-  { label: "Klien", href: "/dashboard/clients", icon: Users, roles: ["ADMIN"] },
+  { label: "Klien", href: "/dashboard/clients", icon: Building2, roles: ["ADMIN"] },
+  { label: "Pengguna", href: "/dashboard/users", icon: Users, roles: ["ADMIN"] },
   { label: "Arsip", href: "/dashboard/archive", icon: Archive, roles: ["ADMIN", "INVESTIGATOR"] },
   { label: "Profil", href: "/dashboard/profile", icon: UserCircle },
 ];

@@ -15,7 +15,13 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ cases }: KanbanBoardProps) {
-  const groupedCases = useMemo(() => groupCasesByStatus(cases), [cases]);
+  const groupedCases = useMemo(() => {
+    const g = groupCasesByStatus(cases);
+    return {
+      ...g,
+      ON_PROGRESS: [...g.ON_PROGRESS, ...(g.PENDING_APPROVAL || [])]
+    };
+  }, [cases]);
 
   return (
     <ScrollArea className="w-full whitespace-nowrap pb-4 md:whitespace-normal">

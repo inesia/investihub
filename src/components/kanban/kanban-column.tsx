@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 const STATUS_TOOLTIPS: Record<CaseStatus, string> = {
   NEW: "Kasus baru yang belum diproses oleh Investigator.",
   ON_PROGRESS: "Investigator sedang melakukan investigasi kasus di lapangan.",
+  PENDING_APPROVAL: "Kasus yang menunggu persetujuan selesai dari Admin.",
   CLOSED: "Kasus telah selesai, laporan akhir sudah diserahkan dan ditutup.",
   ARCHIVED: "Kasus yang telah diarsipkan.",
 };
@@ -77,7 +78,7 @@ export function groupCasesByStatus(
 ): Record<CaseStatus, CaseWithRelations[]> {
   const grouped = {} as Record<CaseStatus, CaseWithRelations[]>;
 
-  for (const status of ["NEW", "ON_PROGRESS", "CLOSED", "ARCHIVED"] as CaseStatus[]) {
+  for (const status of ["NEW", "ON_PROGRESS", "PENDING_APPROVAL", "CLOSED", "ARCHIVED"] as CaseStatus[]) {
     grouped[status] = cases.filter((c) => c.status === status);
   }
 

@@ -124,7 +124,7 @@ export default function RegisterPage() {
                 <Label htmlFor="company">Company Name</Label>
                 <Input
                   id="company"
-                  placeholder="PT Asuransi Sejahtera"
+                  placeholder="PT Prudential Life Assurance"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                 />

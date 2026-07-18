@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Download, FileText, MoreVertical, Edit2, Trash2, X, Check, Plus, Image as ImageIcon, Video, Paperclip, MessageCircle } from "lucide-react";
+import { Download, FileText, MoreVertical, Edit2, Trash2, X, Check, Plus, Image as ImageIcon, Video, Paperclip, MessageCircle, Clock } from "lucide-react";
 import type { CommentWithAuthor, CommentAttachment } from "@/types";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDateTime, getInitials } from "@/lib/utils";
@@ -14,12 +14,27 @@ interface CommentItemProps {
   onEdit?: (id: string, content: string, contentHtml?: string, attachments?: CommentAttachment[]) => void;
   onDelete?: (id: string) => void;
   onReply?: (parentId: string, content: string, contentHtml?: string, attachments?: CommentAttachment[]) => void;
+  onApprove?: (id: string) => void;
+  onClientAction?: (id: string, action: "CONFIRMED" | "HOLD" | null) => void;
+  currentUser?: { id: string; role: string; name: string } | null;
   canManage?: boolean;
   replies?: CommentWithAuthor[];
   isReply?: boolean;
 }
 
-export function CommentItem({ comment, index = 0, onEdit, onDelete, onReply, canManage = false, replies = [], isReply = false }: CommentItemProps) {
+export function CommentItem({ 
+  comment, 
+  index = 0, 
+  onEdit, 
+  onDelete, 
+  onReply, 
+  onApprove,
+  onClientAction,
+  currentUser,
+  canManage = false, 
+  replies = [], 
+  isReply = false 
+}: CommentItemProps) {
   const hasHtml = Boolean(comment.contentHtml?.trim());
   const hasAttachments = Boolean(comment.attachments?.length);
   
@@ -333,14 +348,76 @@ export function CommentItem({ comment, index = 0, onEdit, onDelete, onReply, can
 
           {/* Action bar */}
           {!isEditing && !isReply && (
-            <div className="mt-3 flex items-center gap-4 border-t border-neutral-100 pt-3">
-              <button
-                onClick={() => setIsReplying(!isReplying)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
-              >
-                <MessageCircle className="h-3.5 w-3.5" />
-                Balas
-              </button>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-4 border-t border-neutral-100 pt-3">
+              {currentUser?.role !== "CLIENT" && (
+                <button
+                  onClick={() => setIsReplying(!isReplying)}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  Balas
+                </button>
+              )}
+
+              {/* Client action buttons or badges */}
+              {currentUser?.role === "CLIENT" && comment.author.role !== "CLIENT" ? (
+                <div className="flex items-center gap-2">
+                  {comment.clientStatus === "CONFIRMED" ? (
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md border border-green-200">
+                      <Check className="h-3.5 w-3.5" />
+                      Dikonfirmasi Klien
+                    </div>
+                  ) : comment.clientStatus === "HOLD" ? (
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-200">
+                      <Clock className="h-3.5 w-3.5" />
+                      Ditunda Klien
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => onClientAction?.(comment.id, "CONFIRMED")}
+                        className="flex items-center gap-1 rounded bg-green-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-green-700 shadow-sm"
+                      >
+                        <Check className="h-3 w-3 mr-0.5" />
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => onClientAction?.(comment.id, "HOLD")}
+                        className="flex items-center gap-1 rounded bg-amber-500 px-2.5 py-1 text-xs font-semibold text-white hover:bg-amber-600 shadow-sm"
+                      >
+                        <Clock className="h-3 w-3 mr-0.5" />
+                        Hold
+                      </button>
+                    </>
+                  )}
+                  {comment.clientStatus && (
+                    <button
+                      onClick={() => onClientAction?.(comment.id, null)}
+                      className="text-xs text-primary hover:underline font-medium ml-1"
+                    >
+                      Ubah
+                    </button>
+                  )}
+                </div>
+              ) : (
+                /* Approval Badge or Button */
+                comment.isApproved ? (
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md border border-green-200">
+                    <Check className="h-3.5 w-3.5" />
+                    Telah Dikonfirmasi
+                  </div>
+                ) : (
+                  currentUser?.role === "ADMIN" && comment.author.role !== "ADMIN" && (
+                    <button
+                      onClick={() => onApprove?.(comment.id)}
+                      className="flex items-center gap-1.5 text-xs font-bold text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md shadow-sm transition-colors"
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                      Konfirmasi Laporan
+                    </button>
+                  )
+                )
+              )}
             </div>
           )}
         </>
@@ -382,6 +459,8 @@ export function CommentItem({ comment, index = 0, onEdit, onDelete, onReply, can
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onReply={onReply}
+                  onClientAction={onClientAction}
+                  currentUser={currentUser}
                   canManage={canManage}
                   isReply={true}
                 />

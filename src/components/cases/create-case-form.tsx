@@ -25,10 +25,20 @@ import {
 import { validateFile } from "@/lib/note-utils";
 import { REGIONS_BY_PROVINCE } from "@/lib/indonesia-regions";
 
-export function CreateCaseForm() {
+export function CreateCaseForm({
+  initialData,
+  caseId,
+  onCancel,
+  onSuccess,
+}: {
+  initialData?: any;
+  caseId?: string;
+  onCancel?: () => void;
+  onSuccess?: () => void;
+} = {}) {
   const router = useRouter();
   const { user } = useAuth();
-  const { addCase } = useCases();
+  const { addCase, updateCase } = useCases();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [clients, setClients] = useState<MockClient[]>([]);
@@ -45,40 +55,40 @@ export function CreateCaseForm() {
   const DRAFT_KEY = "investihub-create-case-draft";
 
   const [form, setForm] = useState<CreateCaseInput>({
-    policyNumber: "",
-    insuredName: "",
-    description: "",
-    clientId: defaultClientId,
-    assigneeId: "",
-    status: "NEW",
-    city: "",
-    scheduleInvestigator: "",
+    policyNumber: initialData?.policyNumber || "",
+    insuredName: initialData?.insuredName || "",
+    description: initialData?.description || "",
+    clientId: initialData?.clientId || defaultClientId,
+    assigneeId: initialData?.assigneeId || "",
+    status: initialData?.status || "NEW",
+    city: initialData?.city || "",
+    scheduleInvestigator: initialData?.scheduleInvestigator ? new Date(initialData.scheduleInvestigator).toISOString().slice(0, 16) : "",
     documents: [],
     
     // Custom Claim Form Fields
-    claimType: "Critical Illness",
-    policyHolder: "",
-    applicationDate: "",
-    activeDate: "",
-    basicCoverage: "",
-    wop: "",
-    flexiCi: "",
-    addb: "",
-    premium: "",
-    policyAge: "",
-    beneficiary: "",
-    treatmentDate: "",
-    treatmentPlace: "",
-    diagnosis: "",
-    agentName: "",
-    addressKtp: "",
-    addressSpaj: "",
-    investigationTargets: [
+    claimType: initialData?.claimType || "Critical Illness",
+    policyHolder: initialData?.policyHolder || "",
+    applicationDate: initialData?.applicationDate || "",
+    activeDate: initialData?.activeDate || "",
+    basicCoverage: initialData?.basicCoverage || "",
+    wop: initialData?.wop || "",
+    flexiCi: initialData?.flexiCi || "",
+    addb: initialData?.addb || "",
+    premium: initialData?.premium || "",
+    policyAge: initialData?.policyAge || "",
+    beneficiary: initialData?.beneficiary || "",
+    treatmentDate: initialData?.treatmentDate || "",
+    treatmentPlace: initialData?.treatmentPlace || "",
+    diagnosis: initialData?.diagnosis || "",
+    agentName: initialData?.agentName || "",
+    addressKtp: initialData?.addressKtp || "",
+    addressSpaj: initialData?.addressSpaj || "",
+    investigationTargets: initialData?.investigationTargets || [
       "Memastikan kebenaran data Identitas Tertanggung dan data Polis",
       "Memastikan kebenaran Pengajuan data klaim Critical Illness",
       "Melakukan penelusuran riwayat medis Tertanggung sebelumnya"
     ],
-    documentChecklist: [
+    documentChecklist: initialData?.documentChecklist || [
       "SPAJ",
       "Formulir pengajuan Klaim Penyakit Kritis",
       "Surat Keterangan asli dari dokter Spesialis",
@@ -92,6 +102,7 @@ export function CreateCaseForm() {
 
   // Load draft on mount
   useEffect(() => {
+    if (caseId) return;
     try {
       const saved = localStorage.getItem(DRAFT_KEY);
       if (saved) {
@@ -229,12 +240,27 @@ export function CreateCaseForm() {
         return;
       }
 
-      const newCase = addCase(result.data);
-      attachments.forEach(revokePendingAttachment);
-      localStorage.removeItem(DRAFT_KEY);
-      router.push(`/dashboard/cases/${newCase.id}`);
+      if (caseId) {
+        const { documents, ...updatePayload } = result.data;
+        const finalPayload: any = { ...updatePayload };
+        if (documents && documents.length > 0) {
+          finalPayload.documents = [...(initialData?.documents || []), ...documents];
+        }
+        updateCase(caseId, finalPayload);
+        attachments.forEach(revokePendingAttachment);
+        if (onSuccess) onSuccess();
+      } else {
+        const newCase = addCase(result.data);
+        attachments.forEach(revokePendingAttachment);
+        localStorage.removeItem(DRAFT_KEY);
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.push(`/dashboard/cases/${newCase.id}`);
+        }
+      }
     } catch {
-      setErrors({ form: "Failed to create case. Please try again." });
+      setErrors({ form: "Failed to process case. Please try again." });
       setIsSubmitting(false);
     }
   };
@@ -312,7 +338,7 @@ export function CreateCaseForm() {
           ) : (
             <FormField label="Klien Asuransi" className="sm:col-span-2">
               <Input
-                value={user?.companyName ?? "PT Asuransi Sejahtera"}
+                value={user?.companyName ?? ""}
                 disabled
                 className="bg-neutral-50"
               />
@@ -682,7 +708,10 @@ export function CreateCaseForm() {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard")}
+          onClick={() => {
+            if (onCancel) onCancel();
+            else router.push("/dashboard");
+          }}
           disabled={isSubmitting}
         >
           Batal
@@ -693,7 +722,7 @@ export function CreateCaseForm() {
           ) : (
             <User className="mr-2 h-4 w-4" />
           )}
-          Buat Kasus
+          {caseId ? "Simpan Perubahan" : "Buat Kasus"}
         </Button>
       </div>
     </motion.form>

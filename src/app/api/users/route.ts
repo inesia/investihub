@@ -4,19 +4,17 @@ import { Role } from "@prisma/client";
 
 export async function GET() {
   const users = getAllUsers();
-  // Filter out Admin users
-  const filteredUsers = users.filter((u) => u.role !== "ADMIN");
-  return NextResponse.json({ users: filteredUsers });
+  return NextResponse.json({ users });
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, password, companyName } = body;
+    const { name, email, password, companyName, role, photo } = body;
 
-    if (!name || !email || !password || !companyName) {
+    if (!name || !email || !password || (role !== "INVESTIGATOR" && role !== "ADMIN" && !companyName)) {
       return NextResponse.json(
-        { error: "Name, email, password, and companyName are required" },
+        { error: "Name, email, password, and companyName (for clients) are required" },
         { status: 400 }
       );
     }
@@ -25,8 +23,9 @@ export async function POST(req: Request) {
       name,
       email,
       password,
-      role: "CLIENT" as Role,
-      companyName,
+      role: (role || "CLIENT") as Role,
+      companyName: (role === "INVESTIGATOR" || role === "ADMIN") ? undefined : companyName,
+      photo,
     });
 
     if (error) {
@@ -42,7 +41,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-    const { id, name, email, password, companyName } = body;
+    const { id, name, email, password, companyName, role, photo } = body;
 
     if (!id) {
       return NextResponse.json({ error: "User ID is required" }, { status: 400 });
@@ -53,6 +52,8 @@ export async function PUT(req: Request) {
       email,
       password,
       companyName,
+      role: role as any,
+      photo,
     });
 
     if (!updatedUser) {

@@ -94,15 +94,6 @@ const defaultUsers: MockUser[] = [
     role: "INVESTIGATOR",
   },
   {
-    id: "user-client-001",
-    name: "Rina Kusuma",
-    email: "client@investihub.com",
-    password: "password123",
-    role: "CLIENT",
-    companyName: "PT Asuransi Sejahtera",
-    clientId: "client-001",
-  },
-  {
     id: "user-client-allianz",
     name: "Siti Rahayu",
     email: "client@allianz.co.id",
@@ -180,6 +171,7 @@ export function registerUser(data: {
   password: string;
   role: Role;
   companyName?: string;
+  photo?: string;
 }): { user?: MockUser; error?: string } {
   if (findUserByEmail(data.email)) {
     return { error: "Email already registered" };
@@ -200,6 +192,7 @@ export function registerUser(data: {
     companyName: data.companyName,
     clientId,
     tenantSlug: tenantSlug === "default" ? undefined : tenantSlug,
+    photo: data.photo,
   };
 
   const users = loadUsers();
@@ -215,20 +208,31 @@ export function getUserById(id: string): MockUser | undefined {
 
 export function updateUser(
   id: string,
-  updatedData: Partial<Omit<MockUser, "id" | "role">>
+  updatedData: Partial<Omit<MockUser, "id">>
 ): MockUser | null {
   const users = loadUsers();
   const index = users.findIndex((u) => u.id === id);
   if (index === -1) return null;
 
   // If company name was updated, resolve tenantSlug and clientId automatically
-  let extra = {};
-  if (updatedData.companyName !== undefined) {
+  let extra: any = {};
+  if (updatedData.companyName !== undefined && updatedData.companyName !== "") {
     const tenantSlug = resolveTenantSlug({ companyName: updatedData.companyName });
     const clientId = getBrand(tenantSlug).clientId ?? "client-001";
     extra = {
       tenantSlug: tenantSlug === "default" ? undefined : tenantSlug,
       clientId,
+    };
+  }
+
+  // Clear company details if role is changed to something else than CLIENT
+  const finalRole = updatedData.role !== undefined ? updatedData.role : users[index].role;
+  if (finalRole !== "CLIENT") {
+    extra = {
+      ...extra,
+      companyName: null,
+      clientId: null,
+      tenantSlug: null,
     };
   }
 

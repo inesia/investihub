@@ -17,7 +17,8 @@ import {
   Search,
   Filter,
 } from "lucide-react";
-import type { CaseWithRelations, CommentWithAuthor, CommentAttachment } from "@/types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { CaseWithRelations, CommentWithAuthor, CommentAttachment, CaseStatus } from "@/types";
 import { STATUS_LABELS, canPostComments } from "@/types";
 import { StatusBadge } from "@/components/kanban/status-badge";
 import { CommentItem, AttachmentDisplay } from "@/components/cases/comment-item";
@@ -26,41 +27,217 @@ import { useAuth } from "@/contexts/auth-context";
 import { useCases } from "@/contexts/cases-context";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { CreateCaseForm } from "@/components/cases/create-case-form";
 
 interface CaseDetailViewProps {
   caseData: CaseWithRelations;
 }
 
-const mockTimeline = [
-  {
-    id: "tl-1",
-    title: "Case Created",
-    description: "New claim submitted to the system",
-    timestamp: new Date("2024-06-01T09:00:00"),
-    author: "System",
-  },
-  {
-    id: "tl-2",
-    title: "Documents Uploaded",
-    description: "Client uploaded supporting documents and photos",
-    timestamp: new Date("2024-06-02T14:30:00"),
-    author: "Rina Kusuma",
-  },
-  {
-    id: "tl-3",
-    title: "Assigned to Investigator",
-    description: "Case assigned to Ahmad Rizki for verification",
-    timestamp: new Date("2024-06-03T08:15:00"),
-    author: "Admin",
-  },
-  {
-    id: "tl-4",
-    title: "Field Visit Scheduled",
-    description: "On-site inspection scheduled for next week",
-    timestamp: new Date("2024-06-05T11:00:00"),
-    author: "Ahmad Rizki",
-  },
-];
+const COMPANY_LOGOS: Record<string, string> = {
+  "PT Allianz Indonesia": "/brands/allianz/logo.svg",
+  "PT Prudential Life Assurance": "/brands/prudential/Prudential_plc_logo.svg.webp",
+};
+
+const getInitialCommentsForCase = (caseId: string): CommentWithAuthor[] => {
+  const baseDate = new Date("2026-03-15T10:00:00");
+  
+  if (caseId === "case-ci-001") {
+    return [
+      {
+        id: "comment-inv-1",
+        caseId: "case-ci-001",
+        content: `### 1. VERIFIKASI IDENTITAS TERTANGGUNG PADA LINK DUKCAPIL
+
+* Berdasarkan database (Nasional) Dukcapil bahwa NIK KTP dengan No **737103700580xxxx** terdaftar a.n **Desi Ratnasari** yang lahir di Bandung tanggal **30-05-1980** (Sesuai dengan NIK KTP pada dokumen klaim).
+* Berdasarkan database (Nasional) Dukcapil tercatat bahwa Kartu Keluarga No **737103301197xxxx** dengan kepala keluarga **BUDI SANTOSO**, **Desi Ratnasari** (Istri/Tertanggung), **J. SANTOSO** (Anak), **J. SANTOSO** (Anak), **T. SANTOSO** (Anak) dan **ALDI TOMMY** (Adik / Ahli waris).`,
+        contentHtml: `<p><strong>1. VERIFIKASI IDENTITAS TERTANGGUNG PADA LINK DUKCAPIL</strong></p><ul><li>Berdasarkan database (Nasional) Dukcapil bahwa NIK KTP dengan No <strong>737103700580xxxx</strong> terdaftar a.n <strong>Desi Ratnasari</strong> yang lahir di Bandung tanggal <strong>30-05-1980</strong> (Sesuai dengan NIK KTP pada dokumen klaim).</li><li>Berdasarkan database (Nasional) Dukcapil tercatat bahwa Kartu Keluarga No <strong>737103301197xxxx</strong> dengan kepala keluarga <strong>BUDI SANTOSO</strong>, <strong>Desi Ratnasari</strong> (Istri/Tertanggung), <strong>J. SANTOSO</strong> (Anak), <strong>J. SANTOSO</strong> (Anak), <strong>T. SANTOSO</strong> (Anak) dan <strong>ALDI TOMMY</strong> (Adik / Ahli waris).</li></ul>`,
+        createdAt: new Date(baseDate.getTime() + 1000 * 60 * 30), // 10:30
+        authorId: "inv-001",
+        author: { id: "inv-001", name: "Sigit Sartono", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 35)
+      },
+      {
+        id: "comment-inv-2",
+        caseId: "case-ci-001",
+        content: `### 2. PENELUSURAN BPJS
+
+* Berdasarkan Dokumen NIK KTP **737103700580xxxx** a.n **Desi Ratnasari** Tanggal lahir **30-05-1980** terdaftar di BPJS No **000133923xxxx** dengan Faskes Klinik **Pratama dr. A. S. Hamdany**. Kondisi BPJS masih **Aktif**.
+* Berdasarkan data aplikasi Primary Care, tertanggung tercatat **tidak pernah berobat** menggunakan fasilitas BPJS.`,
+        contentHtml: `<p><strong>2. PENELUSURAN BPJS</strong></p><ul><li>Berdasarkan Dokumen NIK KTP <strong>737103700580xxxx</strong> a.n <strong>Desi Ratnasari</strong> Tanggal lahir <strong>30-05-1980</strong> terdaftar di BPJS No <strong>000133923xxxx</strong> dengan Faskes Klinik <strong>Pratama dr. A. S. Hamdany</strong>. Kondisi BPJS masih <strong>Aktif</strong>.</li><li>Berdasarkan data aplikasi Primary Care, tertanggung tercatat <strong>tidak pernah berobat</strong> menggunakan fasilitas BPJS.</li></ul>`,
+        createdAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 2), // 12:00
+        authorId: "inv-001",
+        author: { id: "inv-001", name: "Sigit Sartono", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 2 + 1000 * 60 * 5)
+      },
+      {
+        id: "comment-inv-3",
+        caseId: "case-ci-001",
+        content: `### 3. MENDATANGI FASKES BPJS TERTANGGUNG (Klinik Pratama dr. A. S. Hamdany)
+
+* Tim investigator mendatangi langsung Klinik Pratama dr. A. S. Hamdany dengan hasil penelusuran sebagai berikut:
+  * Bahwa benar nomor BPJS **000133923xxxx** a.n **Desi Ratnasari** terdaftar di Klinik tersebut dan statusnya aktif.
+  * Pihak klinik memvalidasi bahwa faskes tingkat pertama yang bersangkutan memang terdaftar di Klinik Pratama dr. A. S. Hamdany.
+  * Hasil penelusuran rekam medis (RM) menunjukkan bahwa **Desi Ratnasari** tidak pernah berobat secara umum maupun menggunakan fasilitas BPJS di klinik tersebut.`,
+        contentHtml: `<p><strong>3. MENDATANGI FASKES BPJS TERTANGGUNG (Klinik Pratama dr. A. S. Hamdany)</strong></p><ul><li>Tim investigator mendatangi langsung Klinik Pratama dr. A. S. Hamdany dengan hasil penelusuran sebagai berikut:<ul><li>Bahwa benar nomor BPJS <strong>000133923xxxx</strong> a.n <strong>Desi Ratnasari</strong> terdaftar di Klinik tersebut dan statusnya aktif.</li><li>Pihak klinik memvalidasi bahwa faskes tingkat pertama yang bersangkutan memang terdaftar di Klinik Pratama dr. A. S. Hamdany.</li><li>Hasil penelusuran rekam medis (RM) menunjukkan bahwa <strong>Desi Ratnasari</strong> tidak pernah berobat secara umum maupun menggunakan fasilitas BPJS di klinik tersebut.</li></ul></li></ul>`,
+        createdAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 4), // 14:00
+        authorId: "inv-001",
+        author: { id: "inv-001", name: "Sigit Sartono", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 4 + 1000 * 60 * 5)
+      },
+      {
+        id: "comment-inv-4",
+        caseId: "case-ci-001",
+        content: `### 4. PENELUSURAN NOMOR TELEPON TERTANGGUNG
+
+* Investigator melakukan penelusuran terhadap nomor telepon genggam tertanggung yang tertera pada dokumen klaim, yaitu **08510072xxxx**.
+* Penelusuran menggunakan aplikasi pencari kontak (Get Contact) menunjukkan bahwa nomor telepon tersebut terdaftar atas nama **Desi** (sesuai dengan nama tertanggung pada dokumen).`,
+        contentHtml: `<p><strong>4. PENELUSURAN NOMOR TELEPON TERTANGGUNG</strong></p><ul><li>Investigator melakukan penelusuran terhadap nomor telepon genggam tertanggung yang tertera pada dokumen klaim, yaitu <strong>08510072xxxx</strong>.</li><li>Penelusuran menggunakan aplikasi pencari kontak (Get Contact) menunjukkan bahwa nomor telepon tersebut terdaftar atas nama <strong>Desi</strong> (sesuai dengan nama tertanggung pada dokumen).</li></ul>`,
+        createdAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 5), // 15:00
+        authorId: "inv-001",
+        author: { id: "inv-001", name: "Sigit Sartono", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 5 + 1000 * 60 * 5)
+      }
+    ];
+  }
+
+  if (caseId === "case-demo-alz-onprogress") {
+    return [
+      {
+        id: "comment-inv-herman-1",
+        caseId: "case-demo-alz-onprogress",
+        content: `### 1. VERIFIKASI KEPENDUDUKAN (DUKCAPIL)
+        
+* Berdasarkan pencocokan NIK **647101050982xxxx**, data kependudukan a.n **Herman Yusuf** terverifikasi aktif di Dukcapil Kota Balikpapan.
+* Alamat tinggal saat ini sesuai dengan data KTP, yaitu di Jl. Sudirman No. 89, Balikpapan.`,
+        contentHtml: `<p><strong>1. VERIFIKASI KEPENDUDUKAN (DUKCAPIL)</strong></p><ul><li>Berdasarkan pencocokan NIK 647101050982xxxx, data kependudukan a.n Herman Yusuf terverifikasi aktif di Dukcapil Kota Balikpapan.</li><li>Alamat tinggal saat ini sesuai dengan data KTP, yaitu di Jl. Sudirman No. 89, Balikpapan.</li></ul>`,
+        createdAt: new Date(baseDate.getTime()),
+        authorId: "inv-007",
+        author: { id: "inv-007", name: "Prana Ramadhan", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 10)
+      },
+      {
+        id: "comment-inv-herman-2",
+        caseId: "case-demo-alz-onprogress",
+        content: `### 2. KUNJUNGAN LAPANGAN (RS SILOAM BALIKPAPAN)
+        
+* Investigator mendatangi RS Siloam Balikpapan (Cath Lab) untuk memverifikasi rekam medis tindakan Angiografi Koroner.
+* Petugas rekam medis telah menerima surat kuasa pelepasan informasi medis dan saat ini sedang memproses pencarian berkas kunjungan pasien sejak 2 tahun terakhir.`,
+        contentHtml: `<p><strong>2. KUNJUNGAN LAPANGAN (RS SILOAM BALIKPAPAN)</strong></p><ul><li>Investigator mendatangi RS Siloam Balikpapan (Cath Lab) untuk memverifikasi rekam medis tindakan Angiografi Koroner.</li><li>Petugas rekam medis telah menerima surat kuasa pelepasan informasi medis dan saat ini sedang memproses pencarian berkas kunjungan pasien sejak 2 tahun terakhir.</li></ul>`,
+        createdAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 3),
+        authorId: "inv-007",
+        author: { id: "inv-007", name: "Prana Ramadhan", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 3 + 1000 * 60 * 15)
+      }
+    ];
+  }
+
+  if (caseId === "case-demo-pru-onprogress") {
+    return [
+      {
+        id: "comment-inv-diana-1",
+        caseId: "case-demo-pru-onprogress",
+        content: `### 1. VERIFIKASI DUKCAPIL DENPASAR
+        
+* Berdasarkan data Dukcapil Bali, NIK KTP **517101500388xxxx** a.n **Diana Putri** adalah valid dan terdaftar.
+* Suami terdaftar atas nama **Made Arta** selaku Ahli Waris.`,
+        contentHtml: `<p><strong>1. VERIFIKASI DUKCAPIL DENPASAR</strong></p><ul><li>Berdasarkan data Dukcapil Bali, NIK KTP 517101500388xxxx a.n Diana Putri adalah valid dan terdaftar.</li><li>Suami terdaftar atas nama Made Arta selaku Ahli Waris.</li></ul>`,
+        createdAt: new Date(baseDate.getTime()),
+        authorId: "inv-008",
+        author: { id: "inv-008", name: "Anwim Yanma Aji", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 10)
+      },
+      {
+        id: "comment-inv-diana-2",
+        caseId: "case-demo-pru-onprogress",
+        content: `### 2. KUNJUNGAN RSUP PROF. NGOERAH DENPASAR
+        
+* Investigator mendatangi Poli Bedah Saraf RSUP Prof. Ngoerah Denpasar.
+* Pengecekan rekam medis menunjukkan diagnosa Meningioma Cerebri (Tumor Otak Jinak) pertama kali ditegakkan pada tanggal **22-02-2026** berdasarkan hasil pemeriksaan MRI kepala. Penelusuran riwayat medis masa lalu sedang diselidiki.`,
+        contentHtml: `<p><strong>2. KUNJUNGAN RSUP PROF. NGOERAH DENPASAR</strong></p><ul><li>Investigator mendatangi Poli Bedah Saraf RSUP Prof. Ngoerah Denpasar.</li><li>Pengecekan rekam medis menunjukkan diagnosa Meningioma Cerebri (Tumor Otak Jinak) pertama kali ditegakkan pada tanggal 22-02-2026 berdasarkan hasil pemeriksaan MRI kepala. Penelusuran riwayat medis masa lalu sedang diselidiki.</li></ul>`,
+        createdAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 4),
+        authorId: "inv-008",
+        author: { id: "inv-008", name: "Anwim Yanma Aji", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 4 + 1000 * 60 * 15)
+      }
+    ];
+  }
+
+  if (caseId === "case-demo-closed") {
+    return [
+      {
+        id: "comment-inv-lilis-1",
+        caseId: "case-demo-closed",
+        content: `### 1. VERIFIKASI DUKCAPIL & DOMISILI
+        
+* NIK KTP **357805120680xxxx** a.n **Lilis Kartika** terverifikasi valid di Dukcapil Kota Surabaya.
+* Benar bertempat tinggal di Jl. Raya Darmo No. 88, Surabaya bersama suaminya Heri Setiawan.`,
+        contentHtml: `<p><strong>1. VERIFIKASI DUKCAPIL &amp; DOMISILI</strong></p><ul><li>NIK KTP 357805120680xxxx a.n Lilis Kartika terverifikasi valid di Dukcapil Kota Surabaya.</li><li>Benar bertempat tinggal di Jl. Raya Darmo No. 88, Surabaya bersama suaminya Heri Setiawan.</li></ul>`,
+        createdAt: new Date(baseDate.getTime()),
+        authorId: "inv-003",
+        author: { id: "inv-003", name: "Triyani Firdaus", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 15)
+      },
+      {
+        id: "comment-inv-lilis-2",
+        caseId: "case-demo-closed",
+        content: `### 2. KUNJUNGAN RS SILOAM SURABAYA (REKAM MEDIS VERIFIED)
+        
+* Kunjungan ke bagian rekam medis RS Siloam Surabaya mengonfirmasi keaslian hasil MRI kepala pasien tertanggal **20-01-2026**.
+* Hasil wawancara dokter spesialis saraf menyatakan bahwa serangan stroke terjadi mendadak dan tidak ada riwayat keluhan medis serupa yang pernah diperiksakan sebelumnya di rumah sakit tersebut. Kasus dinyatakan bersih dari pre-existing condition.`,
+        contentHtml: `<p><strong>2. KUNJUNGAN RS SILOAM SURABAYA (REKAM MEDIS VERIFIED)</strong></p><ul><li>Kunjungan ke bagian rekam medis RS Siloam Surabaya mengonfirmasi keaslian hasil MRI kepala pasien tertanggal 20-01-2026.</li><li>Hasil wawancara dokter spesialis saraf menyatakan bahwa serangan stroke terjadi mendadak dan tidak ada riwayat keluhan medis serupa yang pernah diperiksakan sebelumnya di rumah sakit tersebut. Kasus dinyatakan bersih dari pre-existing condition.</li></ul>`,
+        createdAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 5),
+        authorId: "inv-003",
+        author: { id: "inv-003", name: "Triyani Firdaus", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 5 + 1000 * 60 * 20)
+      }
+    ];
+  }
+
+  if (caseId === "case-demo-pru-closed") {
+    return [
+      {
+        id: "comment-inv-mega-1",
+        caseId: "case-demo-pru-closed",
+        content: `### 1. VERIFIKASI IDENTITAS TERTANGGUNG
+        
+* NIK KTP **337402121285xxxx** terdaftar atas nama **Mega Utami** di Dukcapil Kota Semarang.
+* Alamat tinggal terverifikasi di Jl. Pemuda No. 102, Semarang.`,
+        contentHtml: `<p><strong>1. VERIFIKASI IDENTITAS TERTANGGUNG</strong></p><ul><li>NIK KTP 337402121285xxxx terdaftar atas nama Mega Utami di Dukcapil Kota Semarang.</li><li>Alamat tinggal terverifikasi di Jl. Pemuda No. 102, Semarang.</li></ul>`,
+        createdAt: new Date(baseDate.getTime()),
+        authorId: "inv-005",
+        author: { id: "inv-005", name: "Akbar Ramadhan", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 10)
+      },
+      {
+        id: "comment-inv-mega-2",
+        caseId: "case-demo-pru-closed",
+        content: `### 2. KUNJUNGAN RSUP DR. KARIADI SEMARANG
+        
+* Investigator memverifikasi laporan hasil biopsi Patologi Anatomi di Poli Onkologi RSUP Dr. Kariadi Semarang.
+* Berkas rekam medis mengonfirmasi adanya diagnosa Carcinoma Cervix Stage IIB tertanggal **12-12-2025** yang bersifat baru (acute oncology). Tidak ditemukan rekam jejak pengobatan kanker atau keluhan ginekologi sebelum polis aktif.`,
+        contentHtml: `<p><strong>2. KUNJUNGAN RSUP DR. KARIADI SEMARANG</strong></p><ul><li>Investigator memverifikasi laporan hasil biopsi Patologi Anatomi di Poli Onkologi RSUP Dr. Kariadi Semarang.</li><li>Berkas rekam medis mengonfirmasi adanya diagnosa Carcinoma Cervix Stage IIB tertanggal 12-12-2025 yang bersifat baru (acute oncology). Tidak ditemukan rekam jejak pengobatan kanker atau keluhan ginekologi sebelum polis aktif.</li></ul>`,
+        createdAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 6),
+        authorId: "inv-005",
+        author: { id: "inv-005", name: "Akbar Ramadhan", role: "INVESTIGATOR" },
+        isApproved: true,
+        approvedAt: new Date(baseDate.getTime() + 1000 * 60 * 60 * 6 + 1000 * 60 * 20)
+      }
+    ];
+  }
+
+  return [];
+};
 
 const initialComments: CommentWithAuthor[] = [];
 
@@ -72,12 +249,20 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
     if (typeof window !== "undefined") {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) return JSON.parse(stored);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const seeded = getInitialCommentsForCase(caseData.id);
+          const hasSeeded = parsed.some((c: any) => c.id.startsWith("comment-inv-"));
+          if (seeded.length > 0 && !hasSeeded) {
+            return [...seeded, ...parsed];
+          }
+          return parsed;
+        }
       } catch (e) {
         console.error("Failed to load comments from local storage", e);
       }
     }
-    return initialComments;
+    return getInitialCommentsForCase(caseData.id);
   });
 
   useEffect(() => {
@@ -85,12 +270,28 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(comments));
     }
   }, [comments, STORAGE_KEY]);
-  const [showDetails, setShowDetails] = useState(false);
+  const isCompleted = caseData.status === "CLOSED" || caseData.status === "ARCHIVED";
+  const [showDetails, setShowDetails] = useState(isCompleted);
   const [showActions, setShowActions] = useState(false);
+  const [isEditingCase, setIsEditingCase] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [investigators, setInvestigators] = useState<any[]>([]);
 
-  const canComment = canPostComments(user?.role);
+  useEffect(() => {
+    if (user?.role === "ADMIN") {
+      fetch("/api/users")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.users) {
+            setInvestigators(data.users.filter((u: any) => u.role === "INVESTIGATOR"));
+          }
+        })
+        .catch((err) => console.error("Failed to fetch investigators", err));
+    }
+  }, [user?.role]);
+
+  const canComment = canPostComments(user?.role) && !isCompleted;
 
   const handleSubmitNote = (data: NoteFormData) => {
     if (!user) return;
@@ -118,7 +319,25 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
 
   const handleCompleteCase = () => {
+    if (user?.role === "INVESTIGATOR") {
+      updateCase(caseData.id, { status: "PENDING_APPROVAL" });
+      alert("Pengajuan penyelesaian kasus berhasil dikirim ke Admin untuk ditinjau.");
+    } else {
+      updateCase(caseData.id, { status: "CLOSED" });
+      alert("Kasus berhasil diselesaikan.");
+    }
+    router.push("/dashboard");
+  };
+
+  const handleApproveCaseCompletion = () => {
     updateCase(caseData.id, { status: "CLOSED" });
+    alert("Kasus disetujui selesai.");
+    router.push("/dashboard");
+  };
+
+  const handleRejectCaseCompletion = () => {
+    updateCase(caseData.id, { status: "ON_PROGRESS" });
+    alert("Pengajuan penyelesaian kasus ditolak. Kasus dikembalikan ke Proses Lapangan.");
     router.push("/dashboard");
   };
 
@@ -142,11 +361,29 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
+  const [overrideStatusOpen, setOverrideStatusOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<CaseStatus | null>(null);
 
   const handleEditComment = (id: string, content: string, contentHtml?: string, attachments?: CommentAttachment[]) => {
     setComments((prev) =>
       prev.map((c) =>
         c.id === id ? { ...c, content, contentHtml, attachments } : c
+      )
+    );
+  };
+
+  const handleApproveComment = (id: string) => {
+    setComments((prev) =>
+      prev.map((c) =>
+        c.id === id ? { ...c, isApproved: true, approvedAt: new Date() } : c
+      )
+    );
+  };
+
+  const handleClientAction = (id: string, action: "CONFIRMED" | "HOLD" | null) => {
+    setComments((prev) =>
+      prev.map((c) =>
+        c.id === id ? { ...c, clientStatus: action } : c
       )
     );
   };
@@ -201,6 +438,19 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
     setComments((prev) => [...prev, comment]);
   };
 
+  if (isEditingCase) {
+    return (
+      <div className="mx-auto max-w-4xl pt-4">
+        <CreateCaseForm 
+          initialData={caseData} 
+          caseId={caseData.id} 
+          onCancel={() => setIsEditingCase(false)}
+          onSuccess={() => setIsEditingCase(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -210,22 +460,50 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
     >
       {/* Header Info */}
       <div className="border-b border-neutral-200 pb-5">
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-3 flex flex-wrap gap-2 items-center justify-between">
           <StatusBadge status={caseData.status} />
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="flex items-center gap-1.5 rounded-lg border border-primary bg-primary px-2.5 py-1 text-[11px] font-bold text-white shadow-sm hover:bg-primary/95 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <span>{showDetails ? "Sembunyikan Informasi Kasus" : "Lihat Detail Informasi Kasus"}</span>
-            <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200 text-white", showDetails && "rotate-180")} />
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {user?.role === "ADMIN" && !isCompleted && (
+              <button
+                onClick={() => setIsEditingCase(true)}
+                className="flex items-center gap-1.5 rounded-lg border border-primary bg-white px-2.5 py-1 text-[11px] font-bold text-primary shadow-sm hover:bg-neutral-50 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <span>Edit Info Kasus</span>
+              </button>
+            )}
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+              className="flex items-center gap-1.5 rounded-lg border border-primary bg-primary px-2.5 py-1 text-[11px] font-bold text-white shadow-sm hover:bg-primary/95 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              <span>{showDetails ? "Sembunyikan Informasi Kasus" : "Lihat Detail Informasi Kasus"}</span>
+              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200 text-white", showDetails && "rotate-180")} />
+            </button>
+          </div>
         </div>
-        <h2 className="text-xl font-bold text-foreground md:text-2xl">
-          {caseData.insuredName}
-        </h2>
-        <p className="mt-1 font-mono text-sm text-muted-foreground">
-          {caseData.policyNumber}
-        </p>
+        <div className="flex items-center gap-3">
+          {caseData.client.logo || COMPANY_LOGOS[caseData.client.companyName ?? caseData.client.name] ? (
+            <Avatar className="h-10 w-10 shrink-0 rounded-md bg-white border border-neutral-100 shadow-sm">
+              <AvatarImage 
+                src={caseData.client.logo || COMPANY_LOGOS[caseData.client.companyName ?? caseData.client.name]} 
+                alt={caseData.client.companyName ?? caseData.client.name} 
+                className="object-contain p-1" 
+              />
+              <AvatarFallback className="rounded-md"><Building2 className="h-5 w-5" /></AvatarFallback>
+            </Avatar>
+          ) : (
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-neutral-100 border border-neutral-200">
+               <Building2 className="h-5 w-5 text-neutral-500" />
+            </div>
+          )}
+          <div>
+            <h2 className="text-xl font-bold text-foreground md:text-2xl">
+              {caseData.insuredName}
+            </h2>
+            <p className="mt-0.5 font-mono text-sm text-muted-foreground">
+              {caseData.policyNumber}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* COLLAPSIBLE CASE DETAILS & TIMELINE */}
@@ -246,11 +524,39 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
                 label="Perusahaan Asuransi"
                 value={caseData.client.companyName ?? caseData.client.name}
               />
-              <DetailRow
-                icon={User}
-                label="Investigator"
-                value={caseData.assignee?.name ?? "Belum ditugaskan"}
-              />
+              {user?.role === "ADMIN" ? (
+                <div className="flex items-start gap-3">
+                  <User className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <div className="w-full">
+                    <p className="text-xs text-muted-foreground">Investigator</p>
+                    <select
+                      className="mt-1 w-full rounded-md border border-neutral-200 p-1 text-sm bg-neutral-50 focus:ring-primary focus:border-primary"
+                      value={caseData.assigneeId || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const inv = investigators.find((u) => u.id === val);
+                        updateCase(caseData.id, {
+                          assigneeId: val || null,
+                          assignee: inv ? { id: inv.id, name: inv.name } : null,
+                        });
+                      }}
+                    >
+                      <option value="">Belum ditugaskan</option>
+                      {investigators.map((inv) => (
+                        <option key={inv.id} value={inv.id}>
+                          {inv.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              ) : (
+                <DetailRow
+                  icon={User}
+                  label="Investigator"
+                  value={caseData.assignee?.name ?? "Belum ditugaskan"}
+                />
+              )}
               <DetailRow
                 icon={MapPin}
                 label="Kota / Kabupaten"
@@ -406,43 +712,15 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
             </div>
           )}
 
-          {/* Riwayat Timeline */}
-          <div className="border-t border-neutral-200 pt-6">
-            <h3 className="mb-5 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Riwayat Timeline
-            </h3>
-            <div className="space-y-0">
-              {mockTimeline.map((event, index) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.06 }}
-                  className="relative flex gap-4 pb-8 last:pb-0"
-                >
-                  {index < mockTimeline.length - 1 && (
-                    <div className="absolute left-[11px] top-7 h-[calc(100%-12px)] w-px bg-red-200" />
-                  )}
-                  <div className="relative z-10 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-white">
-                    <div className="h-2 w-2 rounded-full bg-primary" />
-                  </div>
-                  <div className="flex-1 rounded-xl border border-neutral-200 bg-white p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="font-semibold">{event.title}</p>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDateTime(event.timestamp)}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {event.description}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      by {event.author}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+          {/* Collapse Button at the Bottom */}
+          <div className="flex justify-end border-t border-neutral-200 pt-4 mt-6">
+            <button
+              onClick={() => setShowDetails(false)}
+              className="flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3.5 py-2 text-[11px] font-bold text-neutral-600 shadow-sm hover:bg-neutral-50 hover:text-neutral-900 transition-all focus:outline-none focus:ring-2 focus:ring-neutral-200"
+            >
+              <ChevronDown className="h-3.5 w-3.5 rotate-180" />
+              <span>Sembunyikan Informasi Kasus</span>
+            </button>
           </div>
         </motion.div>
       )}
@@ -524,6 +802,9 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
                 onEdit={handleEditComment}
                 onDelete={triggerDeleteComment}
                 onReply={handleReplyComment}
+                onApprove={handleApproveComment}
+                onClientAction={handleClientAction}
+                currentUser={user}
                 canManage={user?.role === "ADMIN" || user?.id === comment.authorId}
                 replies={getReplies(comment.id)}
               />
@@ -556,9 +837,8 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
                     <select
                       value={caseData.status}
                       onChange={(e) => {
-                        updateCase(caseData.id, { status: e.target.value as any });
-                        alert("Status berhasil diubah secara manual.");
-                        router.push("/dashboard");
+                        setPendingStatus(e.target.value as CaseStatus);
+                        setOverrideStatusOpen(true);
                       }}
                       className="w-full rounded-md border border-red-200 bg-white px-3 py-1.5 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                     >
@@ -571,13 +851,36 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
                 )}
                 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  {caseData.status !== "CLOSED" && caseData.status !== "ARCHIVED" && (
-                    <button 
-                      onClick={handleCompleteCase}
-                      className="flex-1 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-colors"
-                    >
-                      Tandai Selesai
-                    </button>
+                  {caseData.status === "PENDING_APPROVAL" ? (
+                    user?.role === "ADMIN" ? (
+                      <>
+                        <button 
+                          onClick={handleApproveCaseCompletion}
+                          className="flex-1 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-colors"
+                        >
+                          Setujui Selesai
+                        </button>
+                        <button 
+                          onClick={handleRejectCaseCompletion}
+                          className="flex-1 rounded-md bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-700 transition-colors"
+                        >
+                          Tolak & Kembalikan
+                        </button>
+                      </>
+                    ) : (
+                      <div className="flex-1 text-center py-2 px-4 bg-purple-50 border border-purple-200 rounded-md text-purple-700 text-sm font-semibold">
+                        Menunggu Persetujuan Admin
+                      </div>
+                    )
+                  ) : (
+                    caseData.status !== "CLOSED" && caseData.status !== "ARCHIVED" && (
+                      <button 
+                        onClick={handleCompleteCase}
+                        className="flex-1 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-colors"
+                      >
+                        {user?.role === "INVESTIGATOR" ? "Ajukan Penyelesaian" : "Tandai Selesai"}
+                      </button>
+                    )
                   )}
                   {caseData.status === "CLOSED" && (
                     <button 
@@ -645,6 +948,29 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
           </div>
         </div>
       )}
+
+      {/* Confirm Override Status Modal */}
+      <ConfirmModal
+        isOpen={overrideStatusOpen}
+        onClose={() => {
+          setOverrideStatusOpen(false);
+          setPendingStatus(null);
+        }}
+        onConfirm={() => {
+          if (pendingStatus) {
+            updateCase(caseData.id, { status: pendingStatus });
+            setOverrideStatusOpen(false);
+            setPendingStatus(null);
+            alert("Status berhasil diubah secara manual.");
+            router.push("/dashboard");
+          }
+        }}
+        title="Konfirmasi Override Status"
+        message={`Apakah Anda yakin ingin memaksa mengubah status kasus ini menjadi "${pendingStatus ? STATUS_LABELS[pendingStatus] : ""}"? Tindakan ini dapat memengaruhi alur kerja kasus.`}
+        confirmText="Lanjutkan"
+        cancelText="Batalkan"
+        isDestructive={false}
+      />
     </motion.div>
   );
 }

@@ -215,7 +215,7 @@ export function updateUser(
   if (index === -1) return null;
 
   // If company name was updated, resolve tenantSlug and clientId automatically
-  let extra: any = {};
+  let extra: Partial<MockUser> = {};
   if (updatedData.companyName !== undefined && updatedData.companyName !== "") {
     const tenantSlug = resolveTenantSlug({ companyName: updatedData.companyName });
     const clientId = getBrand(tenantSlug).clientId ?? "client-001";
@@ -230,9 +230,9 @@ export function updateUser(
   if (finalRole !== "CLIENT") {
     extra = {
       ...extra,
-      companyName: null,
-      clientId: null,
-      tenantSlug: null,
+      companyName: undefined,
+      clientId: undefined,
+      tenantSlug: undefined,
     };
   }
 

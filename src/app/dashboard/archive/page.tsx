@@ -6,7 +6,7 @@ import { CaseCard } from "@/components/kanban/case-card";
 import { useCases } from "@/contexts/cases-context";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
-import { Calendar, Download, FileSpreadsheet } from "lucide-react";
+import { Calendar, FileSpreadsheet } from "lucide-react";
 
 export default function ArchivePage() {
   const { cases, isLoading } = useCases();
@@ -57,7 +57,7 @@ export default function ArchivePage() {
     }
     
     return filtered.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-  }, [cases, user?.role, user?.clientId, timeRange, startDate, endDate]);
+  }, [cases, user?.role, user?.clientId, user?.id, timeRange, startDate, endDate]);
 
   // Export to Excel handler
   const handleExportToExcel = () => {
@@ -136,7 +136,7 @@ export default function ArchivePage() {
           <div className="flex flex-wrap gap-2 items-center w-full">
             <select
               value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value as any)}
+              onChange={(e) => setTimeRange(e.target.value as "ALL" | "WEEK" | "MONTH" | "YEAR" | "CUSTOM")}
               className="flex h-9 w-full md:w-[200px] rounded-md border border-input bg-background px-3 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="ALL">Semua Waktu</option>

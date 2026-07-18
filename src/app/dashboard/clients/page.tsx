@@ -99,7 +99,10 @@ export default function ClientsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {client.logo ? (
-                    <img src={client.logo} alt={client.name} className="h-10 w-10 rounded-lg object-contain bg-white border border-neutral-200 p-1" />
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={client.logo} alt={client.name} className="h-10 w-10 rounded-lg object-contain bg-white border border-neutral-200 p-1" />
+                    </>
                   ) : (
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-primary">
                       <Building2 className="h-5 w-5" />
@@ -206,6 +209,7 @@ export default function ClientsPage() {
                 <label className="text-sm font-semibold text-neutral-700">Logo Perusahaan</label>
                 <div className="flex items-center gap-3">
                   {formData.logo && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={formData.logo} alt="Preview" className="h-10 w-10 rounded-lg object-contain bg-white border border-neutral-200 p-1" />
                   )}
                   <input

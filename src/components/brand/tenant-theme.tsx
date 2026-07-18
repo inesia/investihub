@@ -40,7 +40,7 @@ export function TenantThemeProvider({
     return () => {
       document.documentElement.setAttribute("data-tenant", "default");
     };
-  }, [user?.clientId, user?.companyName, user?.tenantSlug, pathname]);
+  }, [user?.clientId, user?.companyName, user?.tenantSlug, user?.role, pathname]);
 
   return <>{children}</>;
 }

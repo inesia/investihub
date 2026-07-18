@@ -7,19 +7,22 @@ import { getClients, type MockClient } from "@/lib/client-store";
 import { useAuth } from "@/contexts/auth-context";
 import { Building2, Mail, Plus, User, Shield, Edit2, Trash2, X, AlertCircle, Key } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { type User as PrismaUser, type Role } from "@prisma/client";
+
+type User = PrismaUser & { photo?: string };
 
 export default function UsersPage() {
   const { user: currentUser } = useAuth();
   const isAdmin = currentUser?.role === "ADMIN";
 
   // Data States
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [clients, setClients] = useState<MockClient[]>([]);
   const [roleFilter, setRoleFilter] = useState<"ALL" | "ADMIN" | "INVESTIGATOR" | "CLIENT">("ALL");
 
   // User Modal States
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userFormData, setUserFormData] = useState({
     name: "",
     email: "",
@@ -70,7 +73,7 @@ export default function UsersPage() {
     setIsUserModalOpen(true);
   };
 
-  const openEditUserModal = (user: any) => {
+  const openEditUserModal = (user: User) => {
     setEditingUser(user);
     setUserFormData({
       name: user.name,
@@ -112,7 +115,7 @@ export default function UsersPage() {
 
       setIsUserModalOpen(false);
       refreshUsers();
-    } catch (err) {
+    } catch (_err) {
       setUserError("Terjadi kesalahan koneksi server");
     }
   };
@@ -134,7 +137,7 @@ export default function UsersPage() {
         const data = await res.json();
         alert(data.error || "Gagal menghapus pengguna");
       }
-    } catch (err) {
+    } catch (_err) {
       alert("Gagal menghapus pengguna");
     } finally {
       setUserToDelete(null);
@@ -184,17 +187,23 @@ export default function UsersPage() {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   {u.photo ? (
-                    <img 
-                      src={u.photo} 
-                      alt={u.name} 
-                      className="h-10 w-10 shrink-0 rounded-full object-cover bg-white border border-neutral-200" 
-                    />
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={u.photo} 
+                        alt={u.name} 
+                        className="h-10 w-10 shrink-0 rounded-full object-cover bg-white border border-neutral-200" 
+                      />
+                    </>
                   ) : u.role === "CLIENT" && clients.find((c) => c.name === u.companyName)?.logo ? (
-                    <img 
-                      src={clients.find((c) => c.name === u.companyName)?.logo} 
-                      alt={u.companyName} 
-                      className="h-10 w-10 shrink-0 rounded-full object-contain bg-white border border-neutral-200 p-1" 
-                    />
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={clients.find((c) => c.name === u.companyName)?.logo} 
+                        alt={u.companyName || u.name} 
+                        className="h-10 w-10 shrink-0 rounded-full object-contain bg-white border border-neutral-200 p-1" 
+                      />
+                    </>
                   ) : (
                     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
                       u.role === "INVESTIGATOR" ? "bg-amber-100 text-amber-700" : u.role === "ADMIN" ? "bg-rose-100 text-rose-700" : "bg-blue-100 text-blue-700"
@@ -332,7 +341,10 @@ export default function UsersPage() {
                 <label className="text-sm font-semibold text-neutral-700">Foto Profil (Opsional)</label>
                 <div className="flex items-center gap-3">
                   {userFormData.photo && (
-                    <img src={userFormData.photo} alt="Preview" className="h-10 w-10 rounded-full object-cover bg-white border border-neutral-200" />
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={userFormData.photo} alt="Preview" className="h-10 w-10 rounded-full object-cover bg-white border border-neutral-200" />
+                    </>
                   )}
                   <input
                     type="file"

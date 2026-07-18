@@ -4,8 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FileText, Loader2, User, Building2, Info } from "lucide-react";
-import type { CaseStatus } from "@/types";
-import { CASE_STATUS_COLUMNS } from "@/types";
+import { type Case } from "@prisma/client";
 import { useAuth } from "@/contexts/auth-context";
 import { useCases } from "@/contexts/cases-context";
 import { Button } from "@/components/ui/button";
@@ -31,6 +30,7 @@ export function CreateCaseForm({
   onCancel,
   onSuccess,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialData?: any;
   caseId?: string;
   onCancel?: () => void;
@@ -112,7 +112,7 @@ export function CreateCaseForm({
     } catch (e) {
       console.error("Failed to parse draft", e);
     }
-  }, []);
+  }, [caseId]);
 
   // Save draft on change
   useEffect(() => {
@@ -242,6 +242,7 @@ export function CreateCaseForm({
 
       if (caseId) {
         const { documents, ...updatePayload } = result.data;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const finalPayload: any = { ...updatePayload };
         if (documents && documents.length > 0) {
           finalPayload.documents = [...(initialData?.documents || []), ...documents];

@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ user });
-  } catch (err) {
+  } catch (_err) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 }
@@ -52,7 +52,7 @@ export async function PUT(req: Request) {
       email,
       password,
       companyName,
-      role: role as any,
+      role: role as Role,
       photo,
     });
 
@@ -61,7 +61,7 @@ export async function PUT(req: Request) {
     }
 
     return NextResponse.json({ user: updatedUser });
-  } catch (err) {
+  } catch (_err) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 }
@@ -81,7 +81,7 @@ export async function DELETE(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (err) {
+  } catch (_err) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

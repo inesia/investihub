@@ -29,7 +29,7 @@ export interface SearchResultItem {
   status?: CaseStatus;
 }
 
-import { getClients, type MockClient } from "./client-store";
+import { getClients } from "./client-store";
 
 export const mockClients = getClients();
 

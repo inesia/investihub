@@ -12,11 +12,13 @@ import {
   User,
   MapPin,
   CalendarDays,
-  Paperclip,
   ChevronDown,
   Search,
   Filter,
 } from "lucide-react";
+import { type User as PrismaUser } from "@prisma/client";
+
+type User = PrismaUser & { photo?: string };
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { CaseWithRelations, CommentWithAuthor, CommentAttachment, CaseStatus } from "@/types";
 import { STATUS_LABELS, canPostComments } from "@/types";
@@ -239,7 +241,7 @@ const getInitialCommentsForCase = (caseId: string): CommentWithAuthor[] => {
   return [];
 };
 
-const initialComments: CommentWithAuthor[] = [];
+
 
 export function CaseDetailView({ caseData }: CaseDetailViewProps) {
   const { user } = useAuth();
@@ -252,7 +254,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
         if (stored) {
           const parsed = JSON.parse(stored);
           const seeded = getInitialCommentsForCase(caseData.id);
-          const hasSeeded = parsed.some((c: any) => c.id.startsWith("comment-inv-"));
+          const hasSeeded = parsed.some((c: CommentWithAuthor) => c.id.startsWith("comment-inv-"));
           if (seeded.length > 0 && !hasSeeded) {
             return [...seeded, ...parsed];
           }
@@ -276,7 +278,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
   const [isEditingCase, setIsEditingCase] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
-  const [investigators, setInvestigators] = useState<any[]>([]);
+  const [investigators, setInvestigators] = useState<User[]>([]);
 
   useEffect(() => {
     if (user?.role === "ADMIN") {
@@ -284,7 +286,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
         .then((res) => res.json())
         .then((data) => {
           if (data.users) {
-            setInvestigators(data.users.filter((u: any) => u.role === "INVESTIGATOR"));
+            setInvestigators(data.users.filter((u: User) => u.role === "INVESTIGATOR"));
           }
         })
         .catch((err) => console.error("Failed to fetch investigators", err));

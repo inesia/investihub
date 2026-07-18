@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Download, FileText, MoreVertical, Edit2, Trash2, X, Check, Plus, Image as ImageIcon, Video, Paperclip, MessageCircle, Clock } from "lucide-react";
+import { Download, FileText, MoreVertical, Edit2, Trash2, X, Check, MessageCircle, Clock, Plus } from "lucide-react";
 import type { CommentWithAuthor, CommentAttachment } from "@/types";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDateTime, getInitials } from "@/lib/utils";
@@ -228,6 +228,7 @@ export function CommentItem({
 
                   <div className="flex items-center gap-3">
                     {att.type === "image" && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={att.url} alt={att.name} className="h-14 w-14 shrink-0 rounded-md object-cover" />
                     )}
                     {att.type === "video" && (
@@ -490,6 +491,7 @@ export function AttachmentDisplay({
           onClick={() => setIsPreviewOpen(true)}
           className="block text-left w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm hover:border-neutral-300 transition-all"
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={attachment.url}
             alt={attachment.name}

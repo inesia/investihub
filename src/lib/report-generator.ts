@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+// docx will be required dynamically to bypass Turbopack parsing
 import type { CaseWithRelations, CommentWithAuthor } from "@/types";
 import { STATUS_LABELS } from "@/types";
 import { formatDateTime } from "./utils";
@@ -41,6 +42,8 @@ function parseHtmlToDocxElements(html: string, ParagraphCls: any, TextRunCls: an
 }
 
 export async function generateDocxReport(caseData: CaseWithRelations, comments: CommentWithAuthor[]) {
+  // Use require so Turbopack completely ignores this package during static analysis
+  const docx = require("docx");
   const {
     Document,
     Packer,
@@ -51,7 +54,7 @@ export async function generateDocxReport(caseData: CaseWithRelations, comments: 
     PageBreak,
     HeadingLevel,
     BorderStyle
-  } = await import("docx");
+  } = docx;
 
   // Fetch logo as array buffer using fs in node
   let logoBuffer: Buffer | null = null;

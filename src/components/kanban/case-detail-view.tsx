@@ -29,7 +29,6 @@ import { NoteForm, type NoteFormData } from "@/components/cases/note-form";
 import { useAuth } from "@/contexts/auth-context";
 import { useCases } from "@/contexts/cases-context";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
-import { generateDocxReport } from "@/lib/report-generator";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { CreateCaseForm } from "@/components/cases/create-case-form";
 
@@ -483,7 +482,21 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
                   try {
                     // Only pass approved or confirmed comments to the report
                     const validComments = comments.filter(c => c.isApproved || c.clientStatus === "CONFIRMED");
-                    await generateDocxReport(caseData, validComments);
+                    const res = await fetch("/api/generate-report", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ caseData, comments: validComments })
+                    });
+                    if (!res.ok) throw new Error("Failed to generate report");
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `Laporan_Investigasi_${caseData.policyNumber || "TBD"}.docx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
                   } catch (e) {
                     console.error("Failed to generate report", e);
                   } finally {

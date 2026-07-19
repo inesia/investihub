@@ -1,4 +1,5 @@
-import { saveAs } from "file-saver";
+import fs from "fs/promises";
+import path from "path";
 import type { CaseWithRelations, CommentWithAuthor } from "@/types";
 import { STATUS_LABELS } from "@/types";
 import { formatDateTime } from "./utils";
@@ -52,13 +53,11 @@ export async function generateDocxReport(caseData: CaseWithRelations, comments: 
     BorderStyle
   } = await import("docx");
 
-  // Fetch logo as array buffer
-  let logoBuffer: ArrayBuffer | null = null;
+  // Fetch logo as array buffer using fs in node
+  let logoBuffer: Buffer | null = null;
   try {
-    const response = await fetch("/global_investigasi.png");
-    if (response.ok) {
-      logoBuffer = await response.arrayBuffer();
-    }
+    const logoPath = path.join(process.cwd(), "public", "global_investigasi.png");
+    logoBuffer = await fs.readFile(logoPath);
   } catch (err) {
     console.error("Failed to load logo", err);
   }
@@ -349,6 +348,6 @@ export async function generateDocxReport(caseData: CaseWithRelations, comments: 
     ]
   });
 
-  const blob = await Packer.toBlob(doc);
-  saveAs(blob, `Laporan_Investigasi_${caseData.policyNumber || "TBD"}.docx`);
+  const buffer = await Packer.toBuffer(doc);
+  return buffer;
 }

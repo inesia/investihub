@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, Users, Briefcase, FileText, ChevronRight, Target } from "lucide-react";
+import { BookOpen, Users, Briefcase, FileText, ChevronRight, Layers } from "lucide-react";
 import { BrandLogo } from "@/components/brand/brand-logo";
 
 const DOCS_NAV = [
@@ -7,7 +7,7 @@ const DOCS_NAV = [
   { title: "Peran & Akses", href: "#peran", icon: Users },
   { title: "Manajemen Kasus", href: "#kasus", icon: Briefcase },
   { title: "Laporan & Export", href: "#laporan", icon: FileText },
-  { title: "Tech Stack", href: "#stack", icon: Target },
+  { title: "Tech Stack", href: "#stack", icon: Layers },
 ];
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {

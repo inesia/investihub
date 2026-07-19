@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { 
-  Sparkles, HelpCircle, LayoutDashboard, Target, 
+  Sparkles, HelpCircle, LayoutDashboard, Layers, 
   Users, ShieldAlert, UserCheck, Briefcase, 
   Trello, ArrowRight, Eye, MousePointerClick, 
   FileText, Map, MessageSquare, Download, CheckCircle, Clock 
@@ -47,7 +47,7 @@ export default function DocsPage() {
         </p>
 
         <h3 className="flex items-center gap-2">
-          <Target className="h-5 w-5 text-primary" />
+          <Layers className="h-5 w-5 text-primary" />
           Fitur Utama
         </h3>
         <ul>
@@ -315,7 +315,7 @@ export default function DocsPage() {
       {/* ===================== TECH STACK ===================== */}
       <section id="stack" className="scroll-mt-24">
         <h1 className="flex items-center gap-3">
-          <Target className="h-8 w-8 text-primary" />
+          <Layers className="h-8 w-8 text-primary" />
           Tech Stack
         </h1>
         

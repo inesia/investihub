@@ -15,6 +15,7 @@ import {
   Archive,
   Loader2,
   Building2,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ const navItems: NavItem[] = [
   { label: "Pengguna", href: "/dashboard/users", icon: Users, roles: ["ADMIN"] },
   { label: "Arsip & Report", href: "/dashboard/archive", icon: Archive, roles: ["ADMIN", "INVESTIGATOR"] },
   { label: "Profil", href: "/dashboard/profile", icon: UserCircle },
+  { label: "Panduan", href: "/docs", icon: HelpCircle },
 ];
 
 interface SidebarProps {

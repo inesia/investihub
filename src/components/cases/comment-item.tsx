@@ -360,65 +360,73 @@ export function CommentItem({
                 </button>
               )}
 
-              {/* Client action buttons or badges */}
-              {currentUser?.role === "CLIENT" && comment.author.role !== "CLIENT" ? (
-                <div className="flex items-center gap-2">
-                  {comment.clientStatus === "CONFIRMED" ? (
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md border border-green-200">
-                      <Check className="h-3.5 w-3.5" />
-                      Dikonfirmasi Klien
-                    </div>
-                  ) : comment.clientStatus === "HOLD" ? (
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-200">
-                      <Clock className="h-3.5 w-3.5" />
-                      Ditunda Klien
-                    </div>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => onClientAction?.(comment.id, "CONFIRMED")}
-                        className="flex items-center gap-1 rounded bg-green-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-green-700 shadow-sm"
-                      >
-                        <Check className="h-3 w-3 mr-0.5" />
-                        Confirm
-                      </button>
-                      <button
-                        onClick={() => onClientAction?.(comment.id, "HOLD")}
-                        className="flex items-center gap-1 rounded bg-amber-500 px-2.5 py-1 text-xs font-semibold text-white hover:bg-amber-600 shadow-sm"
-                      >
-                        <Clock className="h-3 w-3 mr-0.5" />
-                        Hold
-                      </button>
-                    </>
-                  )}
-                  {comment.clientStatus && (
-                    <button
-                      onClick={() => onClientAction?.(comment.id, null)}
-                      className="text-xs text-primary hover:underline font-medium ml-1"
-                    >
-                      Ubah
-                    </button>
-                  )}
-                </div>
-              ) : (
-                /* Approval Badge or Button */
-                comment.isApproved ? (
+              <div className="flex items-center gap-2">
+                {/* Client Status Badge (Visible to everyone) */}
+                {comment.clientStatus === "CONFIRMED" && (
                   <div className="flex items-center gap-1.5 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md border border-green-200">
                     <Check className="h-3.5 w-3.5" />
-                    Telah Dikonfirmasi
+                    Dikonfirmasi Klien
                   </div>
-                ) : (
-                  currentUser?.role === "ADMIN" && comment.author.role !== "ADMIN" && (
-                    <button
-                      onClick={() => onApprove?.(comment.id)}
-                      className="flex items-center gap-1.5 text-xs font-bold text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md shadow-sm transition-colors"
-                    >
+                )}
+                {comment.clientStatus === "HOLD" && (
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-200">
+                    <Clock className="h-3.5 w-3.5" />
+                    Ditunda Klien
+                  </div>
+                )}
+
+                {/* Client Action Buttons (Visible only to CLIENT) */}
+                {currentUser?.role === "CLIENT" && comment.author.role !== "CLIENT" && (
+                  <>
+                    {!comment.clientStatus && (
+                      <>
+                        <button
+                          onClick={() => onClientAction?.(comment.id, "CONFIRMED")}
+                          className="flex items-center gap-1 rounded bg-green-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-green-700 shadow-sm"
+                        >
+                          <Check className="h-3 w-3 mr-0.5" />
+                          Confirm
+                        </button>
+                        <button
+                          onClick={() => onClientAction?.(comment.id, "HOLD")}
+                          className="flex items-center gap-1 rounded bg-amber-500 px-2.5 py-1 text-xs font-semibold text-white hover:bg-amber-600 shadow-sm"
+                        >
+                          <Clock className="h-3 w-3 mr-0.5" />
+                          Hold
+                        </button>
+                      </>
+                    )}
+                    {comment.clientStatus && (
+                      <button
+                        onClick={() => onClientAction?.(comment.id, null)}
+                        className="text-xs text-primary hover:underline font-medium ml-1"
+                      >
+                        Ubah
+                      </button>
+                    )}
+                  </>
+                )}
+
+                {/* Admin Approval Badge/Button (Visible to non-CLIENT) */}
+                {currentUser?.role !== "CLIENT" && (
+                  comment.isApproved ? (
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md border border-green-200">
                       <Check className="h-3.5 w-3.5" />
-                      Konfirmasi Laporan
-                    </button>
+                      Dikonfirmasi Admin
+                    </div>
+                  ) : (
+                    currentUser?.role === "ADMIN" && comment.author.role !== "ADMIN" && (
+                      <button
+                        onClick={() => onApprove?.(comment.id)}
+                        className="flex items-center gap-1.5 text-xs font-bold text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md shadow-sm transition-colors"
+                      >
+                        <Check className="h-3.5 w-3.5" />
+                        Konfirmasi Laporan
+                      </button>
+                    )
                   )
-                )
-              )}
+                )}
+              </div>
             </div>
           )}
         </>

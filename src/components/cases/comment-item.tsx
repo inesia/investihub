@@ -350,7 +350,7 @@ export function CommentItem({
           {/* Action bar */}
           {!isEditing && !isReply && (
             <div className="mt-3 flex flex-wrap items-center justify-between gap-4 border-t border-neutral-100 pt-3">
-              {!!onReply && (
+              {!!onReply && currentUser?.role !== "INVESTIGATOR" && (
                 <button
                   onClick={() => setIsReplying(!isReplying)}
                   className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
@@ -432,21 +432,7 @@ export function CommentItem({
         </>
       )}
 
-      {isReplying && (
-        <div className="mt-4 border-l-2 border-primary/20 pl-4 animate-in fade-in slide-in-from-top-2 duration-200">
-          <NoteForm
-            onSubmit={(data) => {
-              if (onReply) {
-                onReply(comment.id, data.content, data.contentHtml, data.attachments);
-              }
-              setIsReplying(false);
-              setShowReplies(true);
-            }}
-            placeholder="Tulis balasan..."
-            submitLabel="Kirim Balasan"
-          />
-        </div>
-      )}
+
 
       {replies.length > 0 && (
         <div className="mt-4">
@@ -474,8 +460,36 @@ export function CommentItem({
                   isReply={true}
                 />
               ))}
+
+              {currentUser?.role === "INVESTIGATOR" && !!onReply && (
+                <div className="pt-2">
+                  <button
+                    onClick={() => setIsReplying(!isReplying)}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    Balas Tanggapan
+                  </button>
+                </div>
+              )}
             </div>
           )}
+        </div>
+      )}
+
+      {isReplying && (
+        <div className="mt-4 border-l-2 border-primary/20 pl-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          <NoteForm
+            onSubmit={(data) => {
+              if (onReply) {
+                onReply(comment.id, data.content, data.contentHtml, data.attachments);
+              }
+              setIsReplying(false);
+              setShowReplies(true);
+            }}
+            placeholder="Tulis balasan..."
+            submitLabel="Kirim Balasan"
+          />
         </div>
       )}
     </motion.div>

@@ -38,11 +38,19 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
               </a>
             ))}
           </nav>
+          <div className="mt-8 px-2 border-t border-neutral-200 pt-4">
+            <Link 
+              href="/dashboard"
+              className="flex items-center gap-2 rounded-md px-2 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900 transition-colors"
+            >
+              &larr; Kembali ke Dashboard
+            </Link>
+          </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto scroll-smooth">
         {/* Mobile Header */}
         <div className="md:hidden flex h-16 items-center border-b border-neutral-200 px-4 bg-white">
           <Link href="/dashboard" className="font-semibold text-neutral-900">

@@ -43,6 +43,19 @@ export default function DocsPage() {
           <li><strong>Interaksi Multi-Pihak:</strong> Klien (Asuransi) dapat menyetujui, menunda, atau meminta revisi.</li>
           <li><strong>Pembuatan Dokumen Otomatis (Auto-DOCX):</strong> Susunan laporan harian di-<em>compile</em> menjadi laporan resmi Microsoft Word.</li>
         </ul>
+
+        <figure className="my-8 rounded-xl border bg-slate-50 p-2 shadow-sm">
+          <Image 
+            src="/images/docs/loginpage.JPG" 
+            alt="Halaman Login InvestiHub" 
+            width={800} 
+            height={400} 
+            className="rounded-lg border w-full h-auto"
+          />
+          <figcaption className="text-center text-sm text-slate-500 mt-2">
+            Halaman masuk aplikasi InvestiHub.
+          </figcaption>
+        </figure>
       </section>
 
       <hr className="my-16 border-dashed border-neutral-300" />
@@ -72,6 +85,19 @@ export default function DocsPage() {
           <li>Dapat mengunduh (download) Laporan Akhir.</li>
         </ul>
 
+        <figure className="my-8 rounded-xl border bg-slate-50 p-2 shadow-sm">
+          <Image 
+            src="/images/docs/role.JPG" 
+            alt="Pengaturan Peran dan Pengguna" 
+            width={800} 
+            height={400} 
+            className="rounded-lg border w-full h-auto"
+          />
+          <figcaption className="text-center text-sm text-slate-500 mt-2">
+            Pengaturan peran pengguna dan hak akses.
+          </figcaption>
+        </figure>
+
         <h2 id="investigator" className="flex items-center gap-2 text-slate-800 mt-12">
           <Briefcase className="h-6 w-6 text-emerald-600" />
           2. Investigator
@@ -97,6 +123,19 @@ export default function DocsPage() {
           <li>Mempunyai hak untuk mengubah status laporan dari Investigator (<em>Confirm</em>, <em>On Hold</em>, atau <em>Request Revision</em>).</li>
           <li>Tidak dapat mengunduh format DOCX.</li>
         </ul>
+
+        <figure className="my-8 rounded-xl border bg-slate-50 p-2 shadow-sm">
+          <Image 
+            src="/images/docs/dashboardklien.JPG" 
+            alt="Dashboard Klien" 
+            width={800} 
+            height={400} 
+            className="rounded-lg border w-full h-auto"
+          />
+          <figcaption className="text-center text-sm text-slate-500 mt-2">
+            Tampilan dashboard khusus untuk Klien (Perusahaan Asuransi).
+          </figcaption>
+        </figure>
       </section>
 
       <hr className="my-16 border-dashed border-neutral-300" />
@@ -114,7 +153,7 @@ export default function DocsPage() {
 
         <figure className="my-8 rounded-xl border bg-slate-50 p-2 shadow-sm">
           <Image 
-            src="/images/docs/kanban.png" 
+            src="/images/docs/kanban.JPG" 
             alt="Ilustrasi Kanban Board" 
             width={800} 
             height={400} 
@@ -171,6 +210,19 @@ export default function DocsPage() {
           <li><strong>Area Atas:</strong> Berisi rangkuman metadata kasus (Nama Tertanggung, Nomor Polis, Faskes, Kota, dll).</li>
           <li><strong>Area Bawah (Timeline):</strong> Berisi riwayat laporan lapangan yang berjalan secara kronologis layaknya <em>feed</em> sosial media.</li>
         </ul>
+
+        <figure className="my-8 rounded-xl border bg-slate-50 p-2 shadow-sm">
+          <Image 
+            src="/images/docs/details.JPG" 
+            alt="Halaman Detail Kasus" 
+            width={800} 
+            height={400} 
+            className="rounded-lg border w-full h-auto"
+          />
+          <figcaption className="text-center text-sm text-slate-500 mt-2">
+            Timeline interaktif pada Detail Kasus.
+          </figcaption>
+        </figure>
       </section>
 
       <hr className="my-16 border-dashed border-neutral-300" />
@@ -188,14 +240,14 @@ export default function DocsPage() {
 
         <figure className="my-8 rounded-xl border bg-slate-50 p-2 shadow-sm">
           <Image 
-            src="/images/docs/reports.png" 
+            src="/images/docs/details.JPG" 
             alt="Ilustrasi Antarmuka Laporan" 
             width={800} 
             height={400} 
             className="rounded-lg border w-full h-auto"
           />
           <figcaption className="text-center text-sm text-slate-500 mt-2">
-            Antarmuka chat interaktif untuk laporan kronologis.
+            Antarmuka interaktif untuk memvalidasi dan membalas laporan secara langsung.
           </figcaption>
         </figure>
 
@@ -252,6 +304,19 @@ export default function DocsPage() {
           <li>Mengabaikan laporan yang masih berstatus <em>On Hold</em> atau ditolak (draft).</li>
           <li>Meng-<em>export</em> dokumen dalam format <code>.docx</code> yang dapat langsung diedit di Microsoft Word untuk penyesuaian akhir (<em>finishing touch</em>).</li>
         </ol>
+
+        <figure className="my-8 rounded-xl border bg-slate-50 p-2 shadow-sm">
+          <Image 
+            src="/images/docs/cover.JPG" 
+            alt="Cover Laporan DOCX" 
+            width={800} 
+            height={400} 
+            className="rounded-lg border w-full h-auto"
+          />
+          <figcaption className="text-center text-sm text-slate-500 mt-2">
+            Contoh hasil cover dokumen yang dibuat secara otomatis.
+          </figcaption>
+        </figure>
 
         <div className="rounded-lg bg-blue-50 p-4 border border-blue-100 text-blue-900 text-sm mt-8">
           <strong>Catatan:</strong> Fitur Unduh Laporan ini diproses 100% pada sistem Server sehingga sangat cepat dan tidak membebani perangkat browser klien.

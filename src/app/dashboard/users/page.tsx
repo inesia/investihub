@@ -5,9 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getClients, type MockClient } from "@/lib/client-store";
 import { useAuth } from "@/contexts/auth-context";
-import { Building2, Mail, Plus, User, Shield, Edit2, Trash2, X, AlertCircle, Key } from "lucide-react";
+import { User, UserPlus, Pencil, Trash2, Mail, Building2, Shield, X, AlertCircle, Key, Plus, Edit2 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import { type User as PrismaUser, type Role } from "@prisma/client";
+import { type User as PrismaUser } from "@prisma/client";
 
 type User = PrismaUser & { photo?: string };
 
@@ -115,7 +115,7 @@ export default function UsersPage() {
 
       setIsUserModalOpen(false);
       refreshUsers();
-    } catch (_err) {
+    } catch {
       setUserError("Terjadi kesalahan koneksi server");
     }
   };
@@ -137,7 +137,7 @@ export default function UsersPage() {
         const data = await res.json();
         alert(data.error || "Gagal menghapus pengguna");
       }
-    } catch (_err) {
+    } catch {
       alert("Gagal menghapus pengguna");
     } finally {
       setUserToDelete(null);

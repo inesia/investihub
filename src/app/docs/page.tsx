@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { 
-  Sparkles, HelpCircle, LayoutDashboard, Layers, 
+  Sparkles, HelpCircle, Layers, 
   Users, ShieldAlert, UserCheck, Briefcase, 
   Trello, ArrowRight, Eye, MousePointerClick, 
   FileText, Map, MessageSquare, Download, CheckCircle, Clock 
@@ -296,7 +296,7 @@ export default function DocsPage() {
         </p>
 
         <p>
-          Cukup tekan tombol <strong>"Unduh Laporan (DOCX)"</strong> pada halaman kasus. Sistem akan secara cerdas:
+          Cukup tekan tombol <strong>&quot;Unduh Laporan (DOCX)&quot;</strong> pada halaman kasus. Sistem akan secara cerdas:
         </p>
         <ol>
           <li>Menyusun halaman <em>Cover</em> resmi dengan logo perusahaan dan detail kasus.</li>

@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ user });
-  } catch (_err) {
+  } catch {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 }
@@ -61,7 +61,7 @@ export async function PUT(req: Request) {
     }
 
     return NextResponse.json({ user: updatedUser });
-  } catch (_err) {
+  } catch {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 }
@@ -81,7 +81,7 @@ export async function DELETE(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (_err) {
+  } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

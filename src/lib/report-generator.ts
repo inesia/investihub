@@ -9,11 +9,12 @@ import { formatDateTime } from "./utils";
  * Strips simple HTML tags and converts them to standard TextRuns or Paragraphs.
  * Since docx requires building paragraphs manually, we do a basic parse here.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseHtmlToDocxElements(html: string, ParagraphCls: any, TextRunCls: any): any[] {
   if (!html) return [];
   
   // A very basic HTML to plain text conversion for docx.
-  let text = html
+  const text = html
     .replace(/<p>/g, "")
     .replace(/<\/p>/g, "\n\n")
     .replace(/<br\s*\/?>/g, "\n")
@@ -43,6 +44,7 @@ function parseHtmlToDocxElements(html: string, ParagraphCls: any, TextRunCls: an
 
 export async function generateDocxReport(caseData: CaseWithRelations, comments: CommentWithAuthor[]) {
   // Use require so Turbopack completely ignores this package during static analysis
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const docx = require("docx");
   const {
     Document,

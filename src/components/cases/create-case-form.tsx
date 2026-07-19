@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FileText, Loader2, User, Building2, Info } from "lucide-react";
-import { type Case } from "@prisma/client";
 import { useAuth } from "@/contexts/auth-context";
 import { useCases } from "@/contexts/cases-context";
 import { Button } from "@/components/ui/button";

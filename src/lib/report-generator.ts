@@ -1,14 +1,3 @@
-import { 
-  Document, 
-  Packer, 
-  Paragraph, 
-  TextRun, 
-  ImageRun, 
-  AlignmentType, 
-  PageBreak, 
-  HeadingLevel,
-  BorderStyle
-} from "docx";
 import { saveAs } from "file-saver";
 import type { CaseWithRelations, CommentWithAuthor } from "@/types";
 import { STATUS_LABELS } from "@/types";
@@ -18,7 +7,7 @@ import { formatDateTime } from "./utils";
  * Strips simple HTML tags and converts them to standard TextRuns or Paragraphs.
  * Since docx requires building paragraphs manually, we do a basic parse here.
  */
-function parseHtmlToDocxElements(html: string): Paragraph[] {
+function parseHtmlToDocxElements(html: string, ParagraphCls: any, TextRunCls: any): any[] {
   if (!html) return [];
   
   // A very basic HTML to plain text conversion for docx.
@@ -42,15 +31,27 @@ function parseHtmlToDocxElements(html: string): Paragraph[] {
   // Split by newlines and create a paragraph for each
   const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
   
-  return lines.map(line => 
-    new Paragraph({
-      children: [new TextRun({ text: line, size: 24 })],
+  return lines.map((line: string) => 
+    new ParagraphCls({
+      children: [new TextRunCls({ text: line, size: 24 })],
       spacing: { after: 120 }
     })
   );
 }
 
 export async function generateDocxReport(caseData: CaseWithRelations, comments: CommentWithAuthor[]) {
+  const {
+    Document,
+    Packer,
+    Paragraph,
+    TextRun,
+    ImageRun,
+    AlignmentType,
+    PageBreak,
+    HeadingLevel,
+    BorderStyle
+  } = await import("docx");
+
   // Fetch logo as array buffer
   let logoBuffer: ArrayBuffer | null = null;
   try {
@@ -306,7 +307,7 @@ export async function generateDocxReport(caseData: CaseWithRelations, comments: 
 
       // Content
       if (comment.contentHtml) {
-        const paragraphs = parseHtmlToDocxElements(comment.contentHtml);
+        const paragraphs = parseHtmlToDocxElements(comment.contentHtml, Paragraph, TextRun);
         children.push(...paragraphs);
       } else {
         const lines = comment.content.split("\n");

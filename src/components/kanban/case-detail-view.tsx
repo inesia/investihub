@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Search,
   Filter,
+  Download,
 } from "lucide-react";
 import { type User as PrismaUser } from "@prisma/client";
 
@@ -28,6 +29,7 @@ import { NoteForm, type NoteFormData } from "@/components/cases/note-form";
 import { useAuth } from "@/contexts/auth-context";
 import { useCases } from "@/contexts/cases-context";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
+import { generateDocxReport } from "@/lib/report-generator";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { CreateCaseForm } from "@/components/cases/create-case-form";
 
@@ -247,6 +249,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
   const { user } = useAuth();
   const { updateCase } = useCases();
   const STORAGE_KEY = `investihub-comments-${caseData.id}`;
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [comments, setComments] = useState<CommentWithAuthor[]>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -471,6 +474,27 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
                 className="flex items-center gap-1.5 rounded-lg border border-primary bg-white px-2.5 py-1 text-[11px] font-bold text-primary shadow-sm hover:bg-neutral-50 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
                 <span>Edit Info Kasus</span>
+              </button>
+            )}
+            {(user?.role === "ADMIN" || user?.role === "INVESTIGATOR") && (
+              <button
+                onClick={async () => {
+                  setIsGeneratingReport(true);
+                  try {
+                    // Only pass approved or confirmed comments to the report
+                    const validComments = comments.filter(c => c.isApproved || c.clientStatus === "CONFIRMED");
+                    await generateDocxReport(caseData, validComments);
+                  } catch (e) {
+                    console.error("Failed to generate report", e);
+                  } finally {
+                    setIsGeneratingReport(false);
+                  }
+                }}
+                disabled={isGeneratingReport}
+                className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-2.5 py-1 text-[11px] font-bold text-neutral-700 shadow-sm hover:bg-neutral-50 transition-all focus:outline-none focus:ring-2 focus:ring-neutral-200 disabled:opacity-50"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>{isGeneratingReport ? "Menyiapkan..." : "Unduh Laporan (DOCX)"}</span>
               </button>
             )}
             <button

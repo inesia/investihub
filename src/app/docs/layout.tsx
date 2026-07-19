@@ -3,10 +3,10 @@ import { BookOpen, Users, Briefcase, FileText, ChevronRight } from "lucide-react
 import { BrandLogo } from "@/components/brand/brand-logo";
 
 const DOCS_NAV = [
-  { title: "Pengantar", href: "/docs", icon: BookOpen },
-  { title: "Peran & Akses", href: "/docs/roles", icon: Users },
-  { title: "Manajemen Kasus", href: "/docs/cases", icon: Briefcase },
-  { title: "Laporan & Export", href: "/docs/reports", icon: FileText },
+  { title: "Pengantar", href: "#pengantar", icon: BookOpen },
+  { title: "Peran & Akses", href: "#peran", icon: Users },
+  { title: "Manajemen Kasus", href: "#kasus", icon: Briefcase },
+  { title: "Laporan & Export", href: "#laporan", icon: FileText },
 ];
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
@@ -25,7 +25,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           </div>
           <nav className="space-y-1">
             {DOCS_NAV.map((item) => (
-              <Link
+              <a
                 key={item.href}
                 href={item.href}
                 className="flex items-center justify-between rounded-md px-2 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-200 hover:text-neutral-900 transition-colors"
@@ -35,7 +35,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                   {item.title}
                 </div>
                 <ChevronRight className="h-3 w-3 text-neutral-400" />
-              </Link>
+              </a>
             ))}
           </nav>
         </div>

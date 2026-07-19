@@ -11,9 +11,9 @@ const DOCS_NAV = [
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex h-screen overflow-hidden bg-white">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-neutral-200 bg-neutral-50/50 hidden md:block">
+      <aside className="w-64 flex-shrink-0 border-r border-neutral-200 bg-neutral-50/50 hidden md:flex md:flex-col overflow-y-auto">
         <div className="flex h-16 items-center border-b border-neutral-200 px-6">
           <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <BrandLogo tenant="default" variant="sidebar" />

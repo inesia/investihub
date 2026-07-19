@@ -350,7 +350,7 @@ export function CommentItem({
           {/* Action bar */}
           {!isEditing && !isReply && (
             <div className="mt-3 flex flex-wrap items-center justify-between gap-4 border-t border-neutral-100 pt-3">
-              {currentUser?.role !== "CLIENT" && (
+              {!!onReply && (
                 <button
                   onClick={() => setIsReplying(!isReplying)}
                   className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"

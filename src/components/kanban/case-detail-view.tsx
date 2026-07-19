@@ -803,7 +803,7 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
                 index={index}
                 onEdit={handleEditComment}
                 onDelete={triggerDeleteComment}
-                onReply={handleReplyComment}
+                onReply={!isCompleted ? handleReplyComment : undefined}
                 onApprove={handleApproveComment}
                 onClientAction={handleClientAction}
                 currentUser={user}
@@ -814,9 +814,9 @@ export function CaseDetailView({ caseData }: CaseDetailViewProps) {
           )}
         </div>
 
-        {!canComment && (
+        {!canComment && user?.role !== "CLIENT" && (
           <p className="mt-5 text-center text-sm text-muted-foreground">
-            Masuk sebagai Klien atau Investigator untuk mengunggah laporan
+            {isCompleted ? "Kasus sudah selesai atau diarsipkan." : "Masuk sebagai Investigator atau Admin untuk mengunggah laporan"}
           </p>
         )}
 

@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Users, ShieldAlert, UserCheck, Briefcase } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Peran & Akses - InvestiHub Docs",
@@ -7,13 +8,28 @@ export const metadata: Metadata = {
 export default function DocsRoles() {
   return (
     <article className="prose prose-neutral prose-lg max-w-none prose-headings:font-bold prose-a:text-primary">
-      <h1>Peran &amp; Hak Akses</h1>
+      <h1 id="peran" className="flex items-center gap-3">
+        <Users className="h-8 w-8 text-primary" />
+        Peran &amp; Hak Akses
+      </h1>
       
       <p className="lead">
         Aplikasi InvestiHub memisahkan akses pengguna ke dalam tiga peran utama untuk memastikan keamanan dan kerahasiaan data: <strong>Admin</strong>, <strong>Investigator</strong>, dan <strong>Client</strong>.
       </p>
 
-      <h2>1. Admin (Administrator)</h2>
+      <div className="bg-slate-50 border p-4 rounded-lg not-prose mb-8">
+        <h4 className="font-semibold mb-2">Di Halaman Ini:</h4>
+        <ul className="text-sm space-y-1 flex flex-col">
+          <li><a href="#admin" className="text-primary hover:underline">1. Admin (Administrator)</a></li>
+          <li><a href="#investigator" className="text-primary hover:underline">2. Investigator</a></li>
+          <li><a href="#client" className="text-primary hover:underline">3. Client (Klien Asuransi)</a></li>
+        </ul>
+      </div>
+
+      <h2 id="admin" className="flex items-center gap-2 text-slate-800">
+        <ShieldAlert className="h-6 w-6 text-red-500" />
+        1. Admin (Administrator)
+      </h2>
       <p>
         Admin adalah pengelola utama sistem. Role ini dipegang oleh staf internal PT Global Investigasi.
       </p>
@@ -26,7 +42,10 @@ export default function DocsRoles() {
         <li>Dapat mengunduh (download) Laporan Akhir.</li>
       </ul>
 
-      <h2>2. Investigator</h2>
+      <h2 id="investigator" className="flex items-center gap-2 text-slate-800">
+        <Briefcase className="h-6 w-6 text-emerald-600" />
+        2. Investigator
+      </h2>
       <p>
         Investigator adalah tim lapangan yang bertugas mengecek fakta medis atau non-medis.
       </p>
@@ -38,7 +57,10 @@ export default function DocsRoles() {
         <li>Dapat mengunduh Laporan Akhir setelah semua laporannya disetujui.</li>
       </ul>
 
-      <h2>3. Client (Klien Asuransi)</h2>
+      <h2 id="client" className="flex items-center gap-2 text-slate-800">
+        <UserCheck className="h-6 w-6 text-blue-600" />
+        3. Client (Klien Asuransi)
+      </h2>
       <p>
         Client mewakili pihak perusahaan asuransi (contoh: PT Allianz, PT Prudential) yang mempercayakan kasus kepada agensi.
       </p>

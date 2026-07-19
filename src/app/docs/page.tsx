@@ -25,6 +25,19 @@ export default function DocsPage() {
           <strong>InvestiHub</strong> adalah platform manajemen kasus investigasi asuransi komprehensif yang dirancang untuk mempercepat, melacak, dan merapikan proses pelaporan lapangan antara pihak perusahaan asuransi, agensi investigasi, dan investigator lapangan.
         </p>
 
+        <figure className="my-8 rounded-xl border bg-slate-50 p-2 shadow-sm">
+          <Image 
+            src="/images/docs/cover.JPG" 
+            alt="Cover Buku Panduan" 
+            width={800} 
+            height={400} 
+            className="rounded-lg border w-full h-auto"
+          />
+          <figcaption className="text-center text-sm text-slate-500 mt-2">
+            Dokumentasi Resmi Aplikasi InvestiHub.
+          </figcaption>
+        </figure>
+
         <h2 className="flex items-center gap-2">
           <HelpCircle className="h-6 w-6 text-primary" />
           Mengapa InvestiHub?
@@ -238,19 +251,6 @@ export default function DocsPage() {
           Keunggulan utama InvestiHub terletak pada transparansi pelaporan lapangan yang bersifat <em>real-time</em> dan alur persetujuan Klien yang cepat.
         </p>
 
-        <figure className="my-8 rounded-xl border bg-slate-50 p-2 shadow-sm">
-          <Image 
-            src="/images/docs/details.JPG" 
-            alt="Ilustrasi Antarmuka Laporan" 
-            width={800} 
-            height={400} 
-            className="rounded-lg border w-full h-auto"
-          />
-          <figcaption className="text-center text-sm text-slate-500 mt-2">
-            Antarmuka interaktif untuk memvalidasi dan membalas laporan secara langsung.
-          </figcaption>
-        </figure>
-
         <h2 className="flex items-center gap-2">
           <Map className="h-6 w-6 text-primary" />
           Alur Pelaporan Lapangan
@@ -305,21 +305,41 @@ export default function DocsPage() {
           <li>Meng-<em>export</em> dokumen dalam format <code>.docx</code> yang dapat langsung diedit di Microsoft Word untuk penyesuaian akhir (<em>finishing touch</em>).</li>
         </ol>
 
-        <figure className="my-8 rounded-xl border bg-slate-50 p-2 shadow-sm">
-          <Image 
-            src="/images/docs/cover.JPG" 
-            alt="Cover Laporan DOCX" 
-            width={800} 
-            height={400} 
-            className="rounded-lg border w-full h-auto"
-          />
-          <figcaption className="text-center text-sm text-slate-500 mt-2">
-            Contoh hasil cover dokumen yang dibuat secara otomatis.
-          </figcaption>
-        </figure>
-
         <div className="rounded-lg bg-blue-50 p-4 border border-blue-100 text-blue-900 text-sm mt-8">
           <strong>Catatan:</strong> Fitur Unduh Laporan ini diproses 100% pada sistem Server sehingga sangat cepat dan tidak membebani perangkat browser klien.
+        </div>
+      </section>
+
+      <hr className="my-16 border-dashed border-neutral-300" />
+
+      {/* ===================== TECH STACK ===================== */}
+      <section id="stack" className="scroll-mt-24">
+        <h1 className="flex items-center gap-3">
+          <Target className="h-8 w-8 text-primary" />
+          Tech Stack
+        </h1>
+        
+        <p className="lead">
+          InvestiHub dibangun menggunakan teknologi web modern untuk memastikan performa yang sangat cepat, pengalaman pengguna yang <em>real-time</em>, dan keamanan tinggi.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          <div className="border border-neutral-200 rounded-lg p-6 bg-white shadow-sm">
+            <h3 className="mt-0 text-lg"><strong>Frontend</strong></h3>
+            <ul className="text-sm">
+              <li><strong>Next.js 15 (App Router):</strong> Framework React super cepat dengan Server Components.</li>
+              <li><strong>React 19:</strong> Library UI terbaru untuk antarmuka interaktif.</li>
+              <li><strong>Tailwind CSS 4:</strong> Framework styling berbasis utilitas yang sangat ringan dan mudah di-<em>custom</em>.</li>
+              <li><strong>Lucide React:</strong> Ikon SVG minimalis nan elegan.</li>
+            </ul>
+          </div>
+          <div className="border border-neutral-200 rounded-lg p-6 bg-white shadow-sm">
+            <h3 className="mt-0 text-lg"><strong>Backend & Data</strong></h3>
+            <ul className="text-sm">
+              <li><strong>Next.js API Routes:</strong> Serverless backend yang menyatu langsung dengan frontend.</li>
+              <li><strong>DOCX Library:</strong> *Generator* dokumen Word di sisi server (Node.js) untuk menghasilkan laporan akhir yang rapi tanpa perlu Microsoft Office.</li>
+            </ul>
+          </div>
         </div>
       </section>
 

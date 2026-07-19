@@ -45,6 +45,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
+  // Docs are for admin only
+  if (pathname.startsWith("/docs") && session?.role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   if (!publicPaths.includes(pathname) && !isProtected && !isAuthPage(pathname)) {
     return NextResponse.next();
   }

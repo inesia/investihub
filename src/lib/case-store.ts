@@ -2,7 +2,7 @@ import type { CaseWithRelations } from "@/types";
 import type { CreateCaseInput } from "@/lib/validations/case";
 import { getClients } from "@/lib/client-store";
 
-const STORAGE_KEY = "investihub-created-cases-v2";
+const STORAGE_KEY = "investihub-created-cases-v3";
 
 export const mockInvestigators = [
   { id: "inv-001", name: "Sigit Sartono" },
@@ -58,8 +58,8 @@ function loadStoredCases(): CaseWithRelations[] {
       assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
-        name: "PT Allianz Indonesia",
-        companyName: "PT Allianz Indonesia",
+        name: "PT Asuransi Allianz Life Indonesia",
+        companyName: "PT Asuransi Allianz Life Indonesia",
       },
       assignee: {
         id: "inv-001",
@@ -242,8 +242,8 @@ function loadStoredCases(): CaseWithRelations[] {
       assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
-        name: "PT Allianz Indonesia",
-        companyName: "PT Allianz Indonesia",
+        name: "PT Asuransi Allianz Life Indonesia",
+        companyName: "PT Asuransi Allianz Life Indonesia",
       },
       assignee: {
         id: "inv-001",
@@ -331,8 +331,8 @@ function loadStoredCases(): CaseWithRelations[] {
       assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
-        name: "PT Allianz Indonesia",
-        companyName: "PT Allianz Indonesia",
+        name: "PT Asuransi Allianz Life Indonesia",
+        companyName: "PT Asuransi Allianz Life Indonesia",
       },
       assignee: {
         id: "inv-001",
@@ -544,8 +544,8 @@ function loadStoredCases(): CaseWithRelations[] {
       assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
-        name: "PT Allianz Indonesia",
-        companyName: "PT Allianz Indonesia",
+        name: "PT Asuransi Allianz Life Indonesia",
+        companyName: "PT Asuransi Allianz Life Indonesia",
       },
       assignee: {
         id: "inv-001",
@@ -702,8 +702,8 @@ function loadStoredCases(): CaseWithRelations[] {
       assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
-        name: "PT Allianz Indonesia",
-        companyName: "PT Allianz Indonesia",
+        name: "PT Asuransi Allianz Life Indonesia",
+        companyName: "PT Asuransi Allianz Life Indonesia",
       },
       assignee: {
         id: "inv-001",

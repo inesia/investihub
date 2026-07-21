@@ -38,6 +38,7 @@ interface CaseDetailViewProps {
 
 const COMPANY_LOGOS: Record<string, string> = {
   "PT Allianz Indonesia": "/brands/allianz/logo.svg",
+  "PT Asuransi Allianz Life Indonesia": "/brands/allianz/logo.svg",
   "PT Prudential Life Assurance": "/brands/prudential/Prudential_plc_logo.svg.webp",
 };
 

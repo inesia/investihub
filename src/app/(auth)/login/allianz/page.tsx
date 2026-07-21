@@ -4,7 +4,7 @@ import AllianzLoginForm from "./allianz-login-form";
 
 export const metadata: Metadata = {
   title: "Allianz Client Portal — InvestiHub",
-  description: "Exclusive claim investigation portal for PT Allianz Indonesia",
+  description: "Exclusive claim investigation portal for PT Asuransi Allianz Life Indonesia",
 };
 
 export default function AllianzLoginPage() {

@@ -59,7 +59,7 @@ export default function AllianzLoginForm() {
             <span className="text-white/80">Portal</span>
           </h2>
           <p className="mt-4 max-w-md text-white/65">
-            Secure access for PT Allianz Indonesia — track claim progress,
+            Secure access for PT Asuransi Allianz Life Indonesia — track claim progress,
             review reporting timelines, and collaborate with investigators.
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function AllianzLoginForm() {
             Allianz Client Sign In
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Exclusive portal for PT Allianz Indonesia clients
+            Exclusive portal for PT Asuransi Allianz Life Indonesia clients
           </p>
 
           {searchParams.get("callbackUrl") && (

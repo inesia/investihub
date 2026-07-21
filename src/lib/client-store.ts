@@ -7,12 +7,12 @@ export interface MockClient {
   logo?: string;
 }
 
-const STORAGE_KEY = "investihub-clients-data-v3"; // increment version to trigger fresh defaultClients with logos
+const STORAGE_KEY = "investihub-clients-data-v4"; // increment version to trigger fresh defaultClients with logos
 
 const defaultClients: MockClient[] = [
   {
     id: "client-002",
-    name: "PT Allianz Indonesia",
+    name: "PT Asuransi Allianz Life Indonesia",
     email: "info@allianz.co.id",
     phone: "+62 21 8765 4321",
     activeCases: 0,

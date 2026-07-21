@@ -99,7 +99,7 @@ const defaultUsers: MockUser[] = [
     email: "client@allianz.co.id",
     password: "password123",
     role: "CLIENT",
-    companyName: "PT Allianz Indonesia",
+    companyName: "PT Asuransi Allianz Life Indonesia",
     clientId: "client-002",
     tenantSlug: "allianz",
   },

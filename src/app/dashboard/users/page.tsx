@@ -216,7 +216,7 @@ export default function UsersPage() {
                       <p className="font-semibold text-sm">{u.name}</p>
                       {u.role === "CLIENT" && u.companyName && (
                         <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[9px] font-bold text-neutral-800 border border-neutral-200">
-                          {u.companyName === "PT Allianz Indonesia" ? "Allianz" : u.companyName === "PT Prudential Life Assurance" ? "Prudential" : u.companyName}
+                          {u.companyName.includes("Allianz") ? "Allianz" : u.companyName === "PT Prudential Life Assurance" ? "Prudential" : u.companyName}
                         </span>
                       )}
                     </div>

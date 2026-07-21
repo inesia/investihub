@@ -175,7 +175,7 @@ export default function ClientsPage() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. PT Allianz Indonesia"
+                  placeholder="e.g. PT Asuransi Allianz Life Indonesia"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   required
                 />

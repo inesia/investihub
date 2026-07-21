@@ -42,7 +42,7 @@ const navItems: NavItem[] = [
   },
   { label: "Klien", href: "/dashboard/clients", icon: Building2, roles: ["ADMIN"] },
   { label: "Pengguna", href: "/dashboard/users", icon: Users, roles: ["ADMIN"] },
-  { label: "Arsip & Report", href: "/dashboard/archive", icon: Archive, roles: ["ADMIN", "INVESTIGATOR"] },
+  { label: "Arsip & Report", href: "/dashboard/archive", icon: Archive, roles: ["ADMIN", "INVESTIGATOR", "CLIENT"] },
   { label: "Profil", href: "/dashboard/profile", icon: UserCircle },
   { label: "Panduan", href: "/docs", icon: HelpCircle },
 ];

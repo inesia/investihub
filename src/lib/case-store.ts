@@ -239,15 +239,15 @@ function loadStoredCases(): CaseWithRelations[] {
       createdAt: now,
       updatedAt: now,
       clientId: "client-002", // Allianz
-      assigneeId: "inv-003", // Triyani Firdaus
+      assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
         name: "PT Allianz Indonesia",
         companyName: "PT Allianz Indonesia",
       },
       assignee: {
-        id: "inv-003",
-        name: "Triyani Firdaus",
+        id: "inv-001",
+        name: "Sigit Sartono",
       },
       city: "Surabaya, Jawa Timur",
       scheduleInvestigator: "2026-02-10T08:30",
@@ -328,15 +328,15 @@ function loadStoredCases(): CaseWithRelations[] {
       createdAt: now,
       updatedAt: now,
       clientId: "client-002", // Allianz
-      assigneeId: "inv-004", // Wahyu Noviansyah
+      assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
         name: "PT Allianz Indonesia",
         companyName: "PT Allianz Indonesia",
       },
       assignee: {
-        id: "inv-004",
-        name: "Wahyu Noviansyah",
+        id: "inv-001",
+        name: "Sigit Sartono",
       },
       city: "Medan, Sumatera Utara",
       scheduleInvestigator: "2025-11-20T09:00",
@@ -541,15 +541,15 @@ function loadStoredCases(): CaseWithRelations[] {
       createdAt: now,
       updatedAt: now,
       clientId: "client-002", // Allianz
-      assigneeId: "inv-007", // Prana Ramadhan
+      assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
         name: "PT Allianz Indonesia",
         companyName: "PT Allianz Indonesia",
       },
       assignee: {
-        id: "inv-007",
-        name: "Prana Ramadhan",
+        id: "inv-001",
+        name: "Sigit Sartono",
       },
       city: "Balikpapan, Kalimantan Timur",
       scheduleInvestigator: "2026-03-20T09:00",
@@ -815,6 +815,8 @@ function loadStoredCases(): CaseWithRelations[] {
           client: def.client,
           city: def.city,
           scheduleInvestigator: def.scheduleInvestigator,
+          assigneeId: def.assigneeId,
+          assignee: def.assignee,
           claimType: def.claimType,
           policyHolder: def.policyHolder,
           applicationDate: def.applicationDate,

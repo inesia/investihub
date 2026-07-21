@@ -775,7 +775,7 @@ function loadStoredCases(): CaseWithRelations[] {
 
     if (!raw) {
       saveStoredCases(mappedDefaults);
-      return mappedDefaults;
+      return mappedDefaults.filter((c) => c.clientId !== "client-003");
     }
     const parsed = JSON.parse(raw) as StoredCase[];
     
@@ -842,7 +842,7 @@ function loadStoredCases(): CaseWithRelations[] {
     });
     saveStoredCases(loaded);
     
-    return loaded;;
+    return loaded.filter((c) => c.clientId !== "client-003");
   } catch {
     return [];
   }

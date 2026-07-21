@@ -126,14 +126,16 @@ const JSON_FILE_PATH = path.join(process.cwd(), "src/lib/users-store.json");
 
 function loadUsers(): MockUser[] {
   try {
-    if (!fs.existsSync(JSON_FILE_PATH)) {
+    let users = defaultUsers;
+    if (fs.existsSync(JSON_FILE_PATH)) {
+      const data = fs.readFileSync(JSON_FILE_PATH, "utf8");
+      users = JSON.parse(data);
+    } else {
       fs.writeFileSync(JSON_FILE_PATH, JSON.stringify(defaultUsers, null, 2));
-      return defaultUsers;
     }
-    const data = fs.readFileSync(JSON_FILE_PATH, "utf8");
-    return JSON.parse(data);
+    return users.filter((u) => u.tenantSlug !== "prudential" && !u.email.toLowerCase().includes("prudential"));
   } catch {
-    return defaultUsers;
+    return defaultUsers.filter((u) => u.tenantSlug !== "prudential" && !u.email.toLowerCase().includes("prudential"));
   }
 }
 

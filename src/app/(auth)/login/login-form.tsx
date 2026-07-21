@@ -138,18 +138,7 @@ export default function LoginForm() {
                   </div>
                 </Link>
 
-                <Link
-                  href="/login/prudential"
-                  className="flex w-full items-center gap-4 rounded-xl border border-[#E81828]/20 bg-[#E81828]/5 p-4 text-left transition-all hover:bg-[#E81828]/10"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm">
-                    <BrandLogo tenant="prudential" variant="mark" markClassName="h-6 w-auto max-w-[40px]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-[#E81828]">Klien Prudential</h3>
-                    <p className="text-sm text-[#E81828]/70">Portal khusus klien Prudential</p>
-                  </div>
-                </Link>
+
               </div>
             </>
           ) : (

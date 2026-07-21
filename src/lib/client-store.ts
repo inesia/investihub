@@ -29,16 +29,17 @@ const defaultClients: MockClient[] = [
 ];
 
 export function getClients(): MockClient[] {
-  if (typeof window === "undefined") return defaultClients;
+  if (typeof window === "undefined") return defaultClients.filter((c) => c.id !== "client-003");
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultClients));
-      return defaultClients;
+      return defaultClients.filter((c) => c.id !== "client-003");
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw) as MockClient[];
+    return parsed.filter((c) => c.id !== "client-003");
   } catch {
-    return defaultClients;
+    return defaultClients.filter((c) => c.id !== "client-003");
   }
 }
 

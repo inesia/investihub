@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import { useAuth } from "@/contexts/auth-context";
-import { getClients } from "@/lib/client-store";
+import { getClients, type MockClient } from "@/lib/client-store";
 import {
   getFinalReports,
   addFinalReport,
@@ -13,21 +13,19 @@ import {
 import {
   FileText,
   Search,
-  Upload,
   Trash2,
   Download,
   Plus,
   X,
   FileUp,
   AlertCircle,
-  Building,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function FinalReportsPage() {
   const { user } = useAuth();
   const [reports, setReports] = useState<FinalReport[]>([]);
-  const [clients, setClients] = useState<any[]>([]);
+  const [clients, setClients] = useState<MockClient[]>([]);
   
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -130,7 +128,7 @@ export default function FinalReportsPage() {
       setIsUploadOpen(false);
       setFormData({ fileName: "", insuredName: "", clientId: "" });
       setSelectedFile(null);
-    } catch (err) {
+    } catch {
       setUploadError("Gagal mengunggah laporan final.");
     }
   };

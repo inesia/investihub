@@ -2,7 +2,7 @@ import type { CaseWithRelations } from "@/types";
 import type { CreateCaseInput } from "@/lib/validations/case";
 import { getClients } from "@/lib/client-store";
 
-const STORAGE_KEY = "investihub-created-cases-v3";
+const STORAGE_KEY = "investihub-created-cases-v4";
 
 export const mockInvestigators = [
   { id: "inv-001", name: "Sigit Sartono" },
@@ -50,7 +50,7 @@ function loadStoredCases(): CaseWithRelations[] {
       id: "case-ci-001",
       policyNumber: "POL-000080509999",
       insuredName: "Desi Ratnasari",
-      status: "NEW",
+      status: "ON_PROGRESS",
       description: "Investigasi klaim penyakit kritis (Critical Illness - Kanker Payudara) tertanggung di wilayah Kota Makassar dan sekitarnya.",
       createdAt: now,
       updatedAt: now,

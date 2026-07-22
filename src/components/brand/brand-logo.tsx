@@ -30,12 +30,14 @@ export function BrandLogo({
   const isSeal = brand.slug === "default" && Boolean(brand.logoSrc);
   const showText = variant !== "mark" && !collapsed && !isWordmark;
 
+  const currentSrc = (inverted && brand.invertedLogoSrc) ? brand.invertedLogoSrc : brand.logoSrc;
+
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      {brand.logoSrc ? (
+      {currentSrc ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={brand.logoSrc}
+          src={currentSrc}
           alt={brand.name}
           width={isWordmark ? 120 : 36}
           height={isWordmark ? 32 : 36}
@@ -53,7 +55,7 @@ export function BrandLogo({
                     collapsed || variant === "mark" ? "h-8 w-8" : "h-9 w-9"
                   )
                 : "h-8 w-8 rounded-lg",
-            inverted && isWordmark && "brightness-0 invert",
+            inverted && isWordmark && !brand.invertedLogoSrc && "brightness-0 invert",
             markClassName
           )}
         />

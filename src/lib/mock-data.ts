@@ -37,7 +37,7 @@ export const mockCases: CaseWithRelations[] = [
     updatedAt: new Date("2024-06-08"),
     clientId: "client-002",
     assigneeId: "inv-002",
-    client: { id: "client-002", name: "PT Asuransi Allianz Life Indonesia", companyName: "PT Asuransi Allianz Life Indonesia" },
+    client: { id: "client-002", name: "PT Asuransi Jiwa Manulife Indonesia", companyName: "PT Asuransi Jiwa Manulife Indonesia" },
     assignee: { id: "inv-002", name: "Maria Gunawan" },
   },
   {
@@ -50,7 +50,7 @@ export const mockCases: CaseWithRelations[] = [
     updatedAt: new Date("2024-06-10"),
     clientId: "client-002",
     assigneeId: "inv-001",
-    client: { id: "client-002", name: "PT Asuransi Allianz Life Indonesia", companyName: "PT Asuransi Allianz Life Indonesia" },
+    client: { id: "client-002", name: "PT Asuransi Jiwa Manulife Indonesia", companyName: "PT Asuransi Jiwa Manulife Indonesia" },
     assignee: { id: "inv-001", name: "Ahmad Rizki" },
   },
   {
@@ -89,7 +89,7 @@ export const mockCases: CaseWithRelations[] = [
     updatedAt: new Date("2024-06-10"),
     clientId: "client-002",
     assigneeId: null,
-    client: { id: "client-002", name: "PT Asuransi Allianz Life Indonesia", companyName: "PT Asuransi Allianz Life Indonesia" },
+    client: { id: "client-002", name: "PT Asuransi Jiwa Manulife Indonesia", companyName: "PT Asuransi Jiwa Manulife Indonesia" },
     assignee: null,
   },
   {

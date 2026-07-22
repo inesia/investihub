@@ -126,6 +126,20 @@ export default function LoginForm() {
                 </button>
 
                 <Link
+                  href="/login/manulife"
+                  className="flex w-full items-center gap-4 rounded-xl border border-[#00A758]/20 bg-[#00A758]/5 p-4 text-left transition-all hover:bg-[#00A758]/10"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm">
+                    <BrandLogo tenant="manulife" variant="mark" markClassName="h-6 w-auto max-w-[40px]" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-[#00A758]">Klien Manulife</h3>
+                    <p className="text-sm text-[#00A758]/70">Portal khusus klien Manulife</p>
+                  </div>
+                </Link>
+
+                {/* Allianz hidden temporarily for presentation
+                <Link
                   href="/login/allianz"
                   className="flex w-full items-center gap-4 rounded-xl border border-[#003781]/20 bg-[#003781]/5 p-4 text-left transition-all hover:bg-[#003781]/10"
                 >
@@ -137,6 +151,7 @@ export default function LoginForm() {
                     <p className="text-sm text-[#003781]/70">Portal khusus klien Allianz</p>
                   </div>
                 </Link>
+                */}
 
 
               </div>

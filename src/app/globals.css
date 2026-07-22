@@ -147,6 +147,40 @@ html {
   --status-closed: #687078;
 }
 
+/* Manulife corporate theme — green (#00A758) */
+:root[data-tenant="manulife"] {
+  --background: #ffffff;
+  --foreground: #0f1c15;
+  --card: #ffffff;
+  --card-foreground: #0f1c15;
+  --popover: #ffffff;
+  --popover-foreground: #0f1c15;
+  --primary: #00A758;
+  --primary-foreground: #ffffff;
+  --secondary: #e6f7ec;
+  --secondary-foreground: #0f1c15;
+  --muted: #e6f7ec;
+  --muted-foreground: #4a6353;
+  --accent: #d1ebd8;
+  --accent-foreground: #00A758;
+  --destructive: #b91c1c;
+  --border: #c2dbc8;
+  --input: #c2dbc8;
+  --ring: #00A758;
+
+  --sidebar: #00A758;
+  --sidebar-foreground: #ffffff;
+  --sidebar-accent: #007A2B;
+
+  /* Status — Manulife green palette */
+  --status-new: #00A758;
+  --status-verification: #007A2B;
+  --status-field: #006020;
+  --status-reporting: #3cb878;
+  --status-submitted: #004010;
+  --status-closed: #4a6353;
+}
+
 /* Investigator theme — Light mode with Purple accents */
 :root[data-tenant="investigator"] {
   --background: #ffffff;

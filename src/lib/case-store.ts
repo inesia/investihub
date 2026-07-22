@@ -2,7 +2,7 @@ import type { CaseWithRelations } from "@/types";
 import type { CreateCaseInput } from "@/lib/validations/case";
 import { getClients } from "@/lib/client-store";
 
-const STORAGE_KEY = "investihub-created-cases-v4";
+const STORAGE_KEY = "investihub-created-cases-v5";
 
 export const mockInvestigators = [
   { id: "inv-001", name: "Sigit Sartono" },
@@ -54,12 +54,12 @@ function loadStoredCases(): CaseWithRelations[] {
       description: "Investigasi klaim penyakit kritis (Critical Illness - Kanker Payudara) tertanggung di wilayah Kota Makassar dan sekitarnya.",
       createdAt: now,
       updatedAt: now,
-      clientId: "client-002", // Allianz
+      clientId: "client-002", // Manulife
       assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
-        name: "PT Asuransi Allianz Life Indonesia",
-        companyName: "PT Asuransi Allianz Life Indonesia",
+        name: "PT Asuransi Jiwa Manulife Indonesia",
+        companyName: "PT Asuransi Jiwa Manulife Indonesia",
       },
       assignee: {
         id: "inv-001",
@@ -238,12 +238,12 @@ function loadStoredCases(): CaseWithRelations[] {
       description: "Investigasi klaim penyakit kritis (Stroke) tertanggung di wilayah Surabaya.",
       createdAt: now,
       updatedAt: now,
-      clientId: "client-002", // Allianz
+      clientId: "client-002", // Manulife
       assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
-        name: "PT Asuransi Allianz Life Indonesia",
-        companyName: "PT Asuransi Allianz Life Indonesia",
+        name: "PT Asuransi Jiwa Manulife Indonesia",
+        companyName: "PT Asuransi Jiwa Manulife Indonesia",
       },
       assignee: {
         id: "inv-001",
@@ -327,12 +327,12 @@ function loadStoredCases(): CaseWithRelations[] {
       description: "Investigasi klaim penyakit kritis (Serangan Jantung) tertanggung di wilayah Medan.",
       createdAt: now,
       updatedAt: now,
-      clientId: "client-002", // Allianz
+      clientId: "client-002", // Manulife
       assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
-        name: "PT Asuransi Allianz Life Indonesia",
-        companyName: "PT Asuransi Allianz Life Indonesia",
+        name: "PT Asuransi Jiwa Manulife Indonesia",
+        companyName: "PT Asuransi Jiwa Manulife Indonesia",
       },
       assignee: {
         id: "inv-001",
@@ -531,7 +531,7 @@ function loadStoredCases(): CaseWithRelations[] {
       ],
     };
 
-    // 6. Allianz On Progress Case (Herman Yusuf)
+    // 6. Manulife On Progress Case (Herman Yusuf)
     const caseAlzOnProgress: CaseWithRelations = {
       id: "case-demo-alz-onprogress",
       policyNumber: "POL-000033445566",
@@ -540,12 +540,12 @@ function loadStoredCases(): CaseWithRelations[] {
       description: "Investigasi klaim penyakit kritis (Serangan Jantung) tertanggung di wilayah Balikpapan.",
       createdAt: now,
       updatedAt: now,
-      clientId: "client-002", // Allianz
+      clientId: "client-002", // Manulife
       assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
-        name: "PT Asuransi Allianz Life Indonesia",
-        companyName: "PT Asuransi Allianz Life Indonesia",
+        name: "PT Asuransi Jiwa Manulife Indonesia",
+        companyName: "PT Asuransi Jiwa Manulife Indonesia",
       },
       assignee: {
         id: "inv-001",
@@ -689,7 +689,7 @@ function loadStoredCases(): CaseWithRelations[] {
       ],
     };
 
-    // 8. Allianz New Case (Budi Hermawan)
+    // 8. Manulife New Case (Budi Hermawan)
     const caseAlzNew: CaseWithRelations = {
       id: "case-demo-alz-new",
       policyNumber: "POL-000011112222",
@@ -698,12 +698,12 @@ function loadStoredCases(): CaseWithRelations[] {
       description: "Investigasi klaim penyakit kritis (Gagal Ginjal) tertanggung di wilayah Jakarta.",
       createdAt: now,
       updatedAt: now,
-      clientId: "client-002", // Allianz
+      clientId: "client-002", // Manulife
       assigneeId: "inv-001", // Sigit Sartono
       client: {
         id: "client-002",
-        name: "PT Asuransi Allianz Life Indonesia",
-        companyName: "PT Asuransi Allianz Life Indonesia",
+        name: "PT Asuransi Jiwa Manulife Indonesia",
+        companyName: "PT Asuransi Jiwa Manulife Indonesia",
       },
       assignee: {
         id: "inv-001",

@@ -1,4 +1,4 @@
-export type TenantSlug = "default" | "allianz" | "prudential" | "investigator";
+export type TenantSlug = "default" | "allianz" | "prudential" | "investigator" | "manulife";
 
 export interface TenantBrand {
   slug: TenantSlug;
@@ -6,6 +6,7 @@ export interface TenantBrand {
   shortName: string;
   tagline: string;
   logoSrc: string | null;
+  invertedLogoSrc?: string | null;
   clientId: string | null;
 }
 
@@ -50,12 +51,21 @@ export const TENANT_BRANDS: Record<TenantSlug, TenantBrand> = {
     logoSrc: "/global_investigasi.png",
     clientId: null,
   },
+  manulife: {
+    slug: "manulife",
+    name: "PT Asuransi Jiwa Manulife Indonesia",
+    shortName: "Manulife",
+    tagline: "Claim Investigation Portal",
+    logoSrc: "/brands/manulife/manulife-logo.png",
+    invertedLogoSrc: "/brands/manulife/logo-manulife-white.png",
+    clientId: "client-002",
+  },
 };
 
 /** Map mock client company IDs to tenant branding */
 const CLIENT_ID_TO_TENANT: Record<string, TenantSlug> = {
-  "client-002": "allianz",
-  "client-003": "prudential",
+  "client-002": "manulife",
+  "client-003": "manulife",
 };
 
 export function isBrandedTenant(slug?: TenantSlug | null): boolean {
@@ -79,10 +89,12 @@ export function resolveTenantSlug(options: {
   tenantSlug?: string | null;
 }): TenantSlug {
   if (options.tenantSlug === "allianz") return "allianz";
+  if (options.tenantSlug === "manulife") return "manulife";
   if (options.tenantSlug === "prudential") return "prudential";
   if (options.clientId) return getTenantFromClientId(options.clientId);
   const company = options.companyName?.toLowerCase() ?? "";
   if (company.includes("allianz")) return "allianz";
+  if (company.includes("manulife")) return "manulife";
   if (company.includes("prudential")) return "prudential";
   return "default";
 }

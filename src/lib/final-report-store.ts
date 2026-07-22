@@ -17,7 +17,7 @@ const defaultReports: FinalReport[] = [
     fileName: "ARU - KIKI MEIVIRA - ALLIANZ - MAKASAR - CI.pdf",
     filePath: "/laporan-final/ARU -KIKI  MEIVIRA  -  ALLIANZ - MAKASAR - CI.pdf",
     insuredName: "Kiki Meivira",
-    clientName: "PT Asuransi Allianz Life Indonesia",
+    clientName: "PT Asuransi Jiwa Manulife Indonesia",
     clientId: "client-002",
     size: "8.0 MB",
     uploadedAt: "2026-03-20T14:30:00.000Z",

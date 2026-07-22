@@ -94,14 +94,14 @@ const defaultUsers: MockUser[] = [
     role: "INVESTIGATOR",
   },
   {
-    id: "user-client-allianz",
+    id: "user-client-manulife",
     name: "Siti Rahayu",
-    email: "client@allianz.co.id",
+    email: "client@manulife.co.id",
     password: "password123",
     role: "CLIENT",
-    companyName: "PT Asuransi Allianz Life Indonesia",
+    companyName: "PT Asuransi Jiwa Manulife Indonesia",
     clientId: "client-002",
-    tenantSlug: "allianz",
+    tenantSlug: "manulife",
   },
   {
     id: "user-client-prudential",

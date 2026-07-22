@@ -23,6 +23,8 @@ export function TenantThemeProvider({
 
     if (pathname?.startsWith("/login/allianz")) {
       slug = "allianz";
+    } else if (pathname?.startsWith("/login/manulife")) {
+      slug = "manulife";
     } else if (pathname?.startsWith("/login/prudential")) {
       slug = "prudential";
     } else if (user?.role === "INVESTIGATOR") {

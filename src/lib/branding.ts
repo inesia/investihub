@@ -33,7 +33,7 @@ export const TENANT_BRANDS: Record<TenantSlug, TenantBrand> = {
     shortName: "Allianz",
     tagline: "Claim Investigation Portal",
     logoSrc: "/brands/allianz/Allianz.svg.webp",
-    clientId: "client-002",
+    clientId: "client-004",
   },
   prudential: {
     slug: "prudential",
@@ -65,7 +65,8 @@ export const TENANT_BRANDS: Record<TenantSlug, TenantBrand> = {
 /** Map mock client company IDs to tenant branding */
 const CLIENT_ID_TO_TENANT: Record<string, TenantSlug> = {
   "client-002": "manulife",
-  "client-003": "manulife",
+  "client-003": "prudential",
+  "client-004": "allianz",
 };
 
 export function isBrandedTenant(slug?: TenantSlug | null): boolean {

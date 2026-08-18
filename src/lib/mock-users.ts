@@ -114,6 +114,16 @@ const defaultUsers: MockUser[] = [
     tenantSlug: "prudential",
   },
   {
+    id: "user-client-allianz",
+    name: "Siti Rahayu",
+    email: "client@allianz.co.id",
+    password: "password123",
+    role: "CLIENT",
+    companyName: "PT Asuransi Allianz Life Indonesia",
+    clientId: "client-004",
+    tenantSlug: "allianz",
+  },
+  {
     id: "user-admin-001",
     name: "Admin User",
     email: "admin@investihub.com",

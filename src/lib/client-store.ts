@@ -7,7 +7,7 @@ export interface MockClient {
   logo?: string;
 }
 
-const STORAGE_KEY = "investihub-clients-data-v5"; // increment version to trigger fresh defaultClients with logos
+const STORAGE_KEY = "investihub-clients-data-v6"; // increment version to trigger fresh defaultClients with logos
 
 const defaultClients: MockClient[] = [
   {
@@ -16,7 +16,7 @@ const defaultClients: MockClient[] = [
     email: "info@manulife.co.id",
     phone: "+62 21 2555 7777",
     activeCases: 0,
-    logo: "/brands/manulife/manulife-logo.png",
+    logo: "/brands/manulife/logo.png",
   },
   {
     id: "client-003",

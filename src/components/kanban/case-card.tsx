@@ -16,7 +16,7 @@ interface CaseCardProps {
 const COMPANY_LOGOS: Record<string, string> = {
   "PT Allianz Indonesia": "/brands/allianz/logo.svg",
   "PT Asuransi Allianz Life Indonesia": "/brands/allianz/logo.svg",
-  "PT Asuransi Jiwa Manulife Indonesia": "/brands/manulife/manulife-logo.png",
+  "PT Asuransi Jiwa Manulife Indonesia": "/brands/manulife/logo.png",
   "PT Prudential Life Assurance": "/brands/prudential/Prudential_plc_logo.svg.webp",
 };
 
